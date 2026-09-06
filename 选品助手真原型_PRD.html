@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>选品助手 · 真原型 PRD</title>
+<style>
+:root{--bg:#f7f8fa;--card:#ffffff;--ink:#1f2329;--sub:#5b6470;--line:#e6e8eb;--accent:#3b5bdb;--accent-soft:#eef2ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:40px 20px 80px}
+.doc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:36px 40px}
+h1{font-size:27px;font-weight:800;margin-bottom:16px;line-height:1.35}
+h2{font-size:21px;font-weight:700;margin:34px 0 12px;padding-left:12px;border-left:4px solid var(--accent);color:var(--ink)}
+h3{font-size:17px;font-weight:700;margin:22px 0 8px;color:var(--ink)}
+hr{border:none;border-top:1px solid var(--line);margin:24px 0}
+p{color:var(--sub);font-size:15px;margin:10px 0;line-height:1.8}
+ul,ol{margin:10px 0 10px 22px;color:var(--sub);font-size:15px}
+li{margin:6px 0;line-height:1.7}
+blockquote{background:var(--accent-soft);border:1px solid #d6deef;border-left:5px solid var(--accent);border-radius:10px;padding:14px 18px;margin:16px 0;color:var(--sub);font-size:14.5px}
+blockquote p{margin:4px 0;color:var(--sub)}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(59,91,219,.3)}
+a:hover{border-bottom-color:var(--accent)}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;color:var(--sub);vertical-align:top}
+th{background:var(--accent-soft);color:var(--accent);font-weight:600}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;background:var(--accent-soft);padding:1px 6px;border-radius:5px;font-size:13px;color:#2b3a8c}
+pre{background:#0f172a;border-radius:12px;padding:18px;overflow:auto;margin:16px 0}
+pre code{background:transparent;color:#cdd6f4;padding:0;font-size:13px;line-height:1.55;white-space:pre}
+strong{color:var(--ink)}
+.back{display:inline-block;margin-bottom:18px;font-size:14px;color:var(--accent);font-weight:600}
+.back:hover{border-bottom:1px solid var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="portfolio.html">&larr; 返回作品集</a>
+  <div class="doc">
+<h1>选品助手 · 真原型 PRD（作品集案例四）</h1>
+<blockquote>
+<p>定位：把《案例一｜AI 选品排期助手》从"概念设计"落地为<strong>真实可运行的 Agent 原型</strong>。
+目标：补上作品集最缺的"我真搭过、跑通过"证据，作为面试最强谈资。
+数据：使用公开/合成零售数据集，<strong>不涉及任何公司机密</strong>（数据隔离原则）。
+✅ 构建状态：原型已落地，mock 模式已验证可运行（见 <code>agent_selection_prototype/demo_output.txt</code>）。</p>
+</blockquote>
+<hr />
+<h2>1. 背景与目标</h2>
+<ul>
+<li><strong>问题</strong>：概念设计阶段的所有判断（8h→3h、采纳率 62% 等）都是预期值，缺乏真实构建与验证。面试官会追问"你真做过吗"。</li>
+<li><strong>目标</strong>：用公开数据搭一个能跑的选品助手原型，验证核心 loop（中文提问 → 数据工具分析 → 诊断/推荐），并沉淀可演示 Demo + 产品文档。</li>
+<li><strong>成功标准（设计预期）</strong>：用户用自然语言完成 1 次选品诊断或招品清单生成；输出可读、可解释；架构清晰可讲。</li>
+</ul>
+<h2>2. 目标用户与场景</h2>
+<ul>
+<li>用户：电商/社区团购运营、采销（非技术，重效率）。</li>
+<li>场景：本工具按节庆周期分为<strong>三个阶段</strong>，由同一个 Agent 贯穿始终（节前 / 节中 / 节后）：</li>
+<li><strong>节前 · 自动推品（前瞻选品）</strong>：节庆/换季前，采销选节日 → 系统出大商品池（本卖场缺、现存商家、同品供价最低、去年 GMV 前 30% 的节庆品）→ 剔除 → 自定义清单 → 一键招商。</li>
+<li><strong>节中 · 实时监控</strong>：开卖期间盯<strong>销量</strong>与 <strong>ROI</strong> 两个指标；出现 ROI 双负时主动提醒<strong>调盘（调整售价）</strong>，无异常不打扰。<ul>
+<li>ROI = GMV 变化率 / 收益率变化差值</li>
+<li>双负判定：GMV 变化率 &lt; 0 且 收益率变化 &lt; 0，即<strong>让利还少卖</strong>——让出去的利润没换回销量，需及时调整售价</li>
+</ul>
+</li>
+<li><strong>节后 · 及时复盘（向后看）</strong>：场次/周期结束后，自动跑复盘——生成高销量/高转化品清单、标出滞销品（支持一键标注）、预生成下节清单待确认，结论沉淀供下个节庆继承。</li>
+<li>界面形态：节前见 <code>case1_ui_mockup.html</code>（选节日 → 出池 → 剔除 → 招商，前瞻口径）；三阶段完整形态见 <code>agent_console_draft.html</code>。</li>
+<li>与概念设计的区别：概念设计只画了 PRD；真原型要<strong>让其中一个核心 loop 真正跑起来</strong>。</li>
+</ul>
+<h2>3. 核心功能（MVP 范围）</h2>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>说明</th>
+<th>是否 MVP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>品类健康度诊断</td>
+<td>输入品类/周期，输出动销、毛利、退货、曝光转化诊断</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>招品清单生成</td>
+<td>选节日后按口径（本卖场缺、现存商家、同品供价最低、去年 GMV 前 30%）一键出大商品池，支持 GMV 前 20%/50% 分层、全国搜索量降序</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>节中 ROI 监控</td>
+<td>开卖期间盯销量与 ROI；ROI 双负（GMV 变化率与收益率变化同负＝让利还少卖）时提醒<strong>调盘（调整售价）</strong></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>节后复盘</td>
+<td>周期结束后自动跑复盘，生成高销量/高转化品清单、标注滞销品、预生成下节清单待确认，结论沉淀供下个节庆继承</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>45 天节庆提醒</td>
+<td>定时触发（概念设计里有，原型可简化）</td>
+<td>⏸ 二期</td>
+</tr>
+<tr>
+<td>一键招商</td>
+<td>涉及外部系统，原型不接真实商家</td>
+<td>⏸ 二期</td>
+</tr>
+</tbody>
+</table>
+<h2>4. Agent 架构</h2>
+<pre><code>用户(中文问法)
+   │
+   ▼
+[LLM 编排层] ── 理解意图 → 决定调用哪些工具 → 汇总成自然语言结论
+   │
+   ├── Tool: query_sales(品类, 周期)   → pandas/SQL 查公开数据集
+   ├── Tool: diagnose(品类)            → 算动销/毛利/退货/转化，打标签
+   ├── Tool: recommend(品类, 节庆)     → 按规则+历史输出招品清单
+   └── Tool: find_anomalies(周期)      → 识别双负异常品
+   │
+   ▼
+[记忆层] 会话上下文（记住用户当前品类/周期）
+[护栏层] 口径校验（周期合法、品类存在）、无 key 时 mock 模式兜底
+</code></pre>
+<ul>
+<li><strong>为什么这样选型</strong>：沿用概念设计的"数据库答是什么、RAG 答为什么、规则用 Prompt"原则；真原型用<strong>函数工具（Tool）</strong>替代 RAG/API，降低依赖、保证可离线演示。</li>
+</ul>
+<h3>4.1 结构化 sheet 与 Agent 的关系（一个常见的设计误区）</h3>
+<p>界面里的"筛选条件 + 商品池 + 清单"是一套<strong>结构化数据工具</strong>——筛选、排序、口径校验这些能力，没有 AI 也成立。如果把产品做成"一堆筛选项"，AI 确实只是锦上添花。本工具的设计关键在于把 Agent 放在<strong>结构化工具之上</strong>作为 intelligence 层，让 AI 承担结构化工具做不了的三件事：
+1. <strong>意图转条件</strong>：采销用一句话（"帮我准备开学季、本卖场缺、供价有优势的节庆爆品"）即可生成清单，Agent 把自然语言解析为筛选条件组合，省去逐一手动配置。
+2. <strong>趋势解释</strong>：全国搜索量等字段不只是展示数字，Agent 结合行业语境说明"为什么涨、值不值得提前招商"，把数据变成判断。
+3. <strong>招商对话</strong>：一键招商背后的商家沟通、议价、跟进由 Agent 完成，结构化按钮只是入口。</p>
+<p>即：<strong>结构化工具保证"查得准、算得对"，Agent 保证"说得清、用得顺、接得住后续动作"</strong>。两者分离但协作，这也是把"选区助手（NL 指令栏）"直接做在界面顶部的原因。
+- <strong>技术栈</strong>：Python + OpenAI 兼容 LLM 客户端（默认支持 DeepSeek/通义/OpenAI，环境变量切换）+ pandas 数据分析。无 key 时进入 mock 模式，仍可按预设逻辑演示。</p>
+<h2>5. 数据方案</h2>
+<ul>
+<li>使用<strong>合成零售数据集</strong>（生成脚本产出 sample_data.csv）：含 品类 / 商品 / 周期 / GMV / 订单 / 毛利 / 退货率 / 曝光转化率 等字段，覆盖生鲜、日用、家电等类目与多周周期。</li>
+<li>理由：公开、可控、无合规风险，足以演示诊断与推荐逻辑；真实数据集（如 Olist）可作为二期替换。</li>
+</ul>
+<h2>6. 评估方案（eval）</h2>
+<ul>
+<li><strong>工具调用准确率</strong>：给定问题，Agent 是否调用了正确工具与参数。</li>
+<li><strong>结论合理性</strong>：诊断/推荐是否符合数据事实（人工抽检 + 规则校验，如推荐品必须来自高动销低退货）。</li>
+<li><strong>可解释性</strong>：每条结论是否附带数据依据。</li>
+<li><strong>护栏</strong>：周期/品类非法输入是否被拦截；mock 与真实模式输出一致性。</li>
+</ul>
+<h2>7. 护栏与边界</h2>
+<ul>
+<li>数据隔离：仅用合成/公开数据，绝不接入公司数据。</li>
+<li>不虚构：Demo 中的指标来自合成数据，明确标注，不暗示真实业务结果。</li>
+<li>范围声明：原型不连接真实商家/招商系统，招商与提醒为二期。</li>
+</ul>
+<h2>8. 复盘与迭代（构建后补）</h2>
+<ul>
+<li>待补充：真实 LLM 联调后的准确率、遇到的最大技术/产品决策、下一步（接 RAG 历史报告、做定时调度、出 Web UI）。</li>
+</ul>
+<h2>9. 交付物（作品集第 4 case）</h2>
+<ul>
+<li><code>agent_selection_prototype/</code>：可运行代码 + 合成数据 + README</li>
+<li>本 PRD + 构建复盘（真实遇到的决策与权衡）</li>
+<li>Demo 录屏/截图（面试可直接展示）</li>
+</ul>
+  </div>
+</div>
+</body>
+</html>
