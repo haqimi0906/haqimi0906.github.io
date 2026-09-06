@@ -71,7 +71,7 @@
   .case-detail table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}
   .case-detail th,.case-detail td{border:1px solid var(--line);padding:8px 10px;text-align:left;color:var(--sub);vertical-align:top}
   .case-detail th{background:var(--accent-soft);color:var(--accent);font-weight:600}
-  .tree{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.55;background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;white-space:pre;color:var(--text);margin:8px 0 4px}
+  .tree{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.55;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;white-space:pre;color:var(--ink);margin:8px 0 4px}
   .case-tags{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
   .case-tags span{font-size:12px;color:var(--accent);background:var(--accent-soft);padding:3px 9px;border-radius:6px}
   .agent-box{border:1px dashed var(--accent);background:var(--accent-soft);border-radius:14px;padding:24px}
@@ -278,7 +278,7 @@
         </table>
         <p><b>选型原则</b>：数据库回答"是什么"，RAG 回答"为什么和怎么做"，能写清规则的用 Prompt，写不清的用 Fine-tuning。</p>
         <h4>预期效果（设计目标）</h4>
-        <p>选品排期 8h→3h（↓62.5%）、商品上架 +12.5%、新品月均 GMV +8%、AI 推荐准确率目标 78%、采纳率目标 62%→72%+、任务发布使用率目标 25%→50%+。</p>
+        <p>选品排期 8h→3h（↓62.5%）、商品上架 +12.5%、新品月均 GMV +8%、AI 推荐准确率目标 78%、采纳率目标 62%→72%+、一键招商功能使用率目标 25%→50%+。</p>
         <h4>复盘与迭代</h4>
         <ul>
           <li>局限：概念设计阶段，未做真实用户可用性测试；准确率依赖底层数据质量。</li>
@@ -298,7 +298,7 @@
           <div class="meta">证明能力② · 数据诊断与验证</div>
           <p class="case-q"><b>这是什么 ▸</b> 对上述选品工具做上线后的数据诊断</p>
           <p class="case-q"><b>解决什么问题 ▸</b> 量化工具实际效果，定位使用瓶颈</p>
-          <p class="case-q"><b>关键动作 ▸</b> 搭建 5 维指标体系，识别采纳率 62% / 准确率 78% / 任务发布使用率 25% 三处瓶颈，排定 P0/P1 优化</p>
+          <p class="case-q"><b>关键动作 ▸</b> 搭建 5 维指标体系，识别采纳率 62% / 准确率 78% / 一键招商功能使用率 25% 三处瓶颈，排定 P0/P1 优化</p>
           <p class="case-q"><b>满足什么需求 ▸</b> 量化工具价值，明确迭代方向</p>
           <div class="case-tags"><span>指标体系</span><span>数据诊断</span><span>瓶颈定位</span></div>
         </div>
@@ -317,18 +317,18 @@
           <tr><td>准确率</td><td>AI 推荐准确率</td><td>/</td><td>78%</td><td>/</td><td>尚可</td></tr>
           <tr><td>采纳率</td><td>采销采纳比例</td><td>/</td><td>62%</td><td>/</td><td>偏低</td></tr>
           <tr><td>使用率</td><td>品类助手/复盘</td><td>/</td><td>&gt;70%</td><td>/</td><td>达标</td></tr>
-          <tr><td>使用率</td><td>任务发布功能</td><td>/</td><td>25%</td><td>/</td><td>很低</td></tr>
+          <tr><td>使用率</td><td>一键招商功能</td><td>/</td><td>25%</td><td>/</td><td>很低</td></tr>
         </table>
         <h4>数据诊断（PM 洞察）</h4>
         <ul>
           <li><b>采纳率 62% vs 准确率 78%</b>：采销认可质量，但约 20% 商品不符合预期导致整单采纳下降 → 需增强"自定义清单"引导（在 AI 清单上采纳/剔除/替换），帮助养成自定义习惯。</li>
-          <li><b>任务发布使用率 25%</b>：可能原因——前置步骤多 / 商家回复率低 / 商家撤仓 → 需问卷定位或拉采销 1v1 访谈再优化。</li>
+          <li><b>一键招商功能使用率 25%</b>：可能原因——前置步骤多 / 商家回复率低 / 商家撤仓 → 需问卷定位或拉采销 1v1 访谈再优化。</li>
         </ul>
         <h4>优化路线</h4>
         <table>
           <tr><th>优先级</th><th>建议</th><th>预期效果</th></tr>
           <tr><td>P0</td><td>增强自定义清单引导（采纳/剔除/替换），养成习惯</td><td>采纳率 62%→72%+</td></tr>
-          <tr><td>P1</td><td>问卷定位 或 采销 1v1 访谈，定位任务发布低使用率原因</td><td>使用率 25%→50%+</td></tr>
+          <tr><td>P1</td><td>问卷定位 或 采销 1v1 访谈，定位一键招商功能低使用率原因</td><td>使用率 25%→50%+</td></tr>
         </table>
         <h4>复盘</h4>
         <p>以数据定位瓶颈、以优先级驱动优化，是数据分析能力在 AI 产品迭代中的直接应用。</p>
@@ -492,7 +492,7 @@
     <h2>简历</h2>
     <div class="sec-sub">已完成框架，工作经历待补真实数据后即为终稿</div>
     <div class="cta">
-      <a class="btn btn-primary" href="简历框架_AI_PM.md">查看 / 下载简历框架</a>
+      <a class="btn btn-primary" href="简历框架_AI_PM.html">查看 / 下载简历框架</a>
     </div>
   </div>
 </section>
