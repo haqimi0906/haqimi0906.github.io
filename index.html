@@ -208,7 +208,7 @@
           <tr><td>45 天节庆提醒</td><td>错过招商窗口</td><td>节庆前 45 天自动提醒 + 跳转清单</td></tr>
           <tr><td>一键招商</td><td>招商效率低</td><td>批量邀请，72h 冷却防重复，15 天最多 3 次</td></tr>
           <tr><td>节中 ROI 监控</td><td>让利还少卖没人盯</td><td>双负品当日提醒，调盘建议采纳率 &gt;60%</td></tr>
-          <tr><td>爆品复盘面板</td><td>不知哪些品该换</td><td>自动跑复盘，押对/押错品主动推送</td></tr>
+          <tr><td>爆品复盘面板</td><td>不知哪些品该换</td><td>自动跑复盘，高销量/高转化品与滞销品主动推送</td></tr>
         </table>
         <h4>关键设计细节</h4>
         <p style="color:var(--sub);font-size:13px;margin:0 0 8px"><b>本工具按节庆周期分三段，由同一个 Agent 贯穿</b>：节前自动推品（见下方界面示意）→ 节中实时监控 → 节后及时复盘（见其后工作流拆解）。设计原则：以 Agent 为核心，重决策、轻操作——Agent 出初稿，采销做终稿。完整交互原型（节前 / 节中 / 节后 三段可切换）：<a class="btn btn-ghost" href="agent_console_draft.html" target="_blank">打开「节庆选品 Agent」交互原型 →</a></p>
@@ -236,23 +236,22 @@
 └── 自定义清单（剔除后归集）
     └── 一键招商 → 由 Agent 对接商家系统</pre>
         <p style="margin:14px 0 6px"><a class="btn btn-ghost" href="case1_ui_mockup.html" target="_blank">打开「节前招商」选品界面交互示意 →</a><span style="color:var(--sub);font-size:13px;margin-left:10px">节日 / 周期范围 / GMV 分层 / 全国搜索量排序等筛选条件均可交互操作</span></p>
-        <p><b>智能核心（tool-use Agent）</b>：节日招商流（45 天提醒 → AI 生成招品清单 → 一键招商 → 商家响应 → 冷却策略 → 确认/替换）；节中监控（盯销量与 ROI，识别 ROI 双负即"让利还少卖"→ 提醒调盘）；节后复盘自动化（定时触发 → 拉数据 + 拉去年同期 → 算指标、识别押对/押错品、打标签 → 结论存储 → 日报/周报/月报推送）。这一层由 tool-use Agent 实现，是工具背后"会自己动手查数"的能力。</p>
+        <p><b>智能核心（tool-use Agent）</b>：节日招商流（45 天提醒 → AI 生成招品清单 → 一键招商 → 商家响应 → 冷却策略 → 确认/替换）；节中监控（盯销量与 ROI，识别 ROI 双负即"让利还少卖"→ 提醒调盘）；节后复盘自动化（定时触发 → 拉数据 + 拉去年同期 → 算指标、识别高销量/高转化品 与 滞销品、打标签 → 结论存储 → 日报/周报/月报推送）。这一层由 tool-use Agent 实现，是工具背后"会自己动手查数"的能力。</p>
         <h4>节中 · 实时监控（销量 + ROI）</h4>
         <p>开卖期间的监控口径与处置动作。<b>异常才打扰，无异常不推送</b>。</p>
         <table>
           <tr><th>监控项</th><th>口径</th><th>判定</th><th>处置动作</th></tr>
           <tr><td>销量</td><td>销售件数日环比 / 对比预期</td><td>异常波动（爆量或断崖）</td><td>补货 / 上调售价控量</td></tr>
           <tr><td>ROI</td><td>GMV 变化率 / 收益率变化差值</td><td>双负：GMV 变化率 与 收益率变化 同时为负</td><td><b>调盘（调整售价）</b> / 换品</td></tr>
-          <tr><td>让利有效（正向）</td><td>收益率下降但 GMV 明显增长</td><td>让利换来销量</td><td>维持现价，不打扰</td></tr>
         </table>
-        <p style="color:var(--sub);font-size:13px"><b>关键设计</b>：双负即"让利还少卖"——让出去的利润没换回销量，是最该被及时干预的信号；同时保留"让利有效"的正向结论，避免把降价换成销量的品误判为问题品而误伤。</p>
+        <p style="color:var(--sub);font-size:13px"><b>关键设计</b>：双负即"让利还少卖"——让出去的利润没换回销量，是最该被及时干预的信号。</p>
         <h4>节后 · 及时复盘（向后看）工作流拆解</h4>
         <table>
           <tr><th>节点</th><th>输入</th><th>做什么</th><th>输出</th><th>用什么</th></tr>
           <tr><td>总体逻辑</td><td>采销商品销售数据</td><td>Agent 按日/周/月出爆品复盘</td><td>日/周/月复盘</td><td>API 拉数 + Prompt 分析，结论存 RAG</td></tr>
           <tr><td>定时触发</td><td>/</td><td>场次结束（晚 11 点）后 15min 自动开始</td><td>AI 分析报告</td><td>系统定时（非 AI）</td></tr>
           <tr><td>拉数据</td><td>/</td><td>从数据库拉当前数据 + RAG 拉去年同期</td><td>日维度爆品数据</td><td>API + RAG</td></tr>
-          <tr><td>算指标</td><td>日维度爆品数据</td><td>分析 GMV/收益率/销量/曝光变化，识别押对 / 押错品</td><td>问题单品清单</td><td>Prompt</td></tr>
+          <tr><td>算指标</td><td>日维度爆品数据</td><td>分析 GMV/收益率/销量/曝光变化，识别高销量/高转化品 与 滞销品</td><td>问题单品清单</td><td>Prompt</td></tr>
           <tr><td>打标签</td><td>问题商品</td><td>归类（低转化 / GMV 异常 / 曝光下降）</td><td>问题清单 + 标签</td><td>Prompt</td></tr>
           <tr><td>留存备份</td><td>问题清单 + 标签</td><td>存 RAG 文档，备后续使用</td><td>RAG 文档</td><td>RAG 存储</td></tr>
           <tr><td>推送采销</td><td>问题清单 + 标签</td><td>日报/周报/月报推送至采销前端</td><td>推送 + 清单详情</td><td>系统推送</td></tr>
