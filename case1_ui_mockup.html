@@ -182,7 +182,6 @@
       <label class="chk"><input type="checkbox" id="f-nostore" checked /> 本卖场缺货</label>
       <label class="chk"><input type="checkbox" id="f-hasvendor" checked /> 现存商家</label>
       <label class="chk"><input type="checkbox" id="f-lowest" checked /> 同品供价最低</label>
-      <label class="chk"><input type="checkbox" id="f-dedup" /> 同款过滤</label>
     </div>
     <div class="f-row">
       <div class="f-item"><label>商品名称</label><input type="text" class="sm" id="f-name" placeholder="搜索商品名称" /></div>
@@ -314,7 +313,6 @@ function query(){
   var nostore = document.getElementById('f-nostore').checked;
   var hasvendor = document.getElementById('f-hasvendor').checked;
   var lowest = document.getElementById('f-lowest').checked;
-  var dedup = document.getElementById('f-dedup').checked;
   var gmvMode = document.querySelector('#f-gmv button.on').getAttribute('data-v');
   var name = document.getElementById('f-name').value.trim();
   var brand = document.getElementById('f-brand').value.trim();
@@ -324,7 +322,6 @@ function query(){
   var sorted = PRODUCTS.slice().sort(function(a,b){ return b.gmv - a.gmv; });
   sorted.forEach(function(p,i){ p._rank = i+1; });
 
-  var seen = {};
   pool = PRODUCTS.filter(function(p){
     if(nostore && p.inStore) return false;          // 本卖场缺货
     if(hasvendor && !p.hasVendor) return false;       // 现存商家
@@ -334,10 +331,6 @@ function query(){
     if(name && p.name.indexOf(name) < 0) return false;
     if(brand && p.brand.indexOf(brand) < 0) return false;
     if(cat && p.cat !== cat) return false;
-    if(dedup){
-      if(seen[p.name]) return false;
-      seen[p.name] = true;
-    }
     return true;
   });
 
@@ -438,7 +431,6 @@ document.getElementById('btn-reset').addEventListener('click', function(){
   document.getElementById('f-nostore').checked = true;
   document.getElementById('f-hasvendor').checked = true;
   document.getElementById('f-lowest').checked = true;
-  document.getElementById('f-dedup').checked = false;
   document.getElementById('f-name').value = '';
   document.getElementById('f-brand').value = '';
   document.getElementById('f-cat').value = '';
