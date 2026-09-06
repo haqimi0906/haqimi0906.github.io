@@ -81,10 +81,6 @@
   .agent-box table{border-collapse:collapse;width:100%;margin:10px 0;font-size:13px}
   .agent-box th,.agent-box td{border:1px solid var(--line);padding:8px 10px;text-align:left;color:var(--sub);vertical-align:top}
   .agent-box th{background:#fff;color:var(--accent);font-weight:600}
-  .demo{margin-top:18px;background:#0f172a;border-radius:12px;padding:18px;overflow:auto;max-height:360px}
-  .demo pre{color:#cdd6f4;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
-  .demo .u{color:#89dceb;font-weight:600}
-  .demo .badge{display:inline-block;font-size:11px;color:#a6e3a1;background:rgba(166,227,161,.15);padding:1px 7px;border-radius:5px;margin-bottom:6px}
   .cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:18px}
   .btn{display:inline-block;padding:11px 20px;border-radius:10px;font-weight:600;font-size:15px}
   .btn-primary{background:var(--accent);color:#fff}
@@ -443,7 +439,7 @@
       <ul>
         <li><b>质量</b>：RAG + Prompt + 带出处，达到"辅助决策"够用的准确度；工具是帮手不是替身，不追求零出错，追求说得清、能核对。</li>
         <li><b>成本</b>：没有训练开销，只有接口调用与存储，低于微调和多智能体编排。</li>
-        <li><b>速度</b>：选品和复盘不是实时交易，节中监控按批跑即可；外部搜索热度走内部平台，不卡单次请求。重点在节中双负早发现，减少"让利还少卖"的亏损。</li>
+        <li><b>速度</b>：选品和复盘不是实时交易，节中监控按批跑即可；外部搜索热度走内部的高搜索趋势平台或授权数据，不爬，不卡单次请求。重点在节中双负早发现，减少"让利还少卖"的亏损。</li>
       </ul>
     </div>
 
@@ -477,65 +473,17 @@
 <section id="proof">
   <div class="wrap">
     <h2>落地验证</h2>
-    <div class="sec-sub">把角度一的智能核心落地为可运行原型，验证想法能跑通</div>
-
-    <h3 style="font-size:20px;font-weight:700;margin:8px 0 4px">选品助手 Agent 原型</h3>
-    <div class="sec-sub">把角度一的智能核心落地为可运行的 tool-use Agent · 零依赖可演示</div>
-    <div class="agent-box">
-      <h3>选品助手 · Agent 原型（已构建，可运行）</h3>
-      <p style="color:var(--sub);margin-top:8px">将角度一的智能核心落地为可运行的 tool-use Agent：用户中文提问 → 意图路由 → 调用数据工具 → 输出诊断与选品建议。流程节点与实现能力对应如下：</p>
-      <h4>流程节点 → 实现能力映射</h4>
-      <table>
-        <tr><th>角度一流程节点</th><th>实现能力</th><th>示例问法 / 输出</th></tr>
-        <tr><td>拉数据（API + RAG）</td><td>query_sales / diagnose 工具自动取数</td><td>"日用品最近销售怎么样"→ GMV / 订单 / 退货率</td></tr>
-        <tr><td>算指标 · 识别"复盘双负"</td><td>find_anomalies 工具：GMV 降 且 曝光转化降</td><td>"复盘上周异常品"→ 异常品清单</td></tr>
-        <tr><td>打标签</td><td>工具内规则：复盘双负 = 建议替换 / 优化</td><td>输出含"建议替换 / 优化"标注</td></tr>
-        <tr><td>生成招品清单（招商流）</td><td>recommend 工具：高 GMV 低退货筛品</td><td>"给我一份开学季招品清单"</td></tr>
-        <tr><td>定时触发 / 推送采销</td><td>设计为系统定时 + 推送；演示中以用户提问触发、即时返回代替</td><td>问答即触发 + 返回</td></tr>
-        <tr><td>留存备份（存 RAG）</td><td>设计预留：结论存 RAG 备查；演示版未持久化</td><td>/</td></tr>
-      </table>
-      <ul>
-        <li>架构：意图路由（mock / LLM 双模式）+ 4 个数据分析工具（diagnose / recommend / find_anomalies / query_sales）+ 护栏（口径校验、空值兜底）</li>
-        <li>数据：公开 / 合成零售数据集（生鲜 / 日用 / 家电三品类、多周维度），不涉及任何公司机密</li>
-        <li>工程：Python 零依赖（仅标准库），mock 模式无需 API key 即可演示，接入 LLM_API_KEY 后切换真实大模型</li>
-        <li>产出：可运行 Demo + 产品文档（需求 / PRD / 架构 / eval / 复盘）</li>
-      </ul>
-      <p style="color:var(--accent);background:var(--accent-soft);border:1px solid #c5cde0;border-radius:8px;padding:8px 12px;font-size:13px;margin-top:16px"><b>演示模式说明</b>：当前 Demo 为 <b>mock（关键词路由）模式</b>，按规则识别意图、返回模板结果，<b>非真实大模型</b>；零依赖、可直接试玩。接入 API Key 后可切换真实 LLM 模式。</p>
-      <div class="demo">
-        <span class="badge">DEMO 实跑输出 · mock 模式</span>
-        <pre><span class="u">用户：</span>帮我诊断一下生鲜品类的健康度
-品类健康度诊断：
-· 生鲜：GMV 3,057,601，订单 76,198，均价毛利 20.0%，退货率 6.5%，曝光转化 9.6% → 关注
-
-<span class="u">用户：</span>给我一份开学季的招品清单
-建议重点招商清单（开学季）（基于最近周期高GMV低退货）：
-· 冷链鲜奶：周GMV 127,080，退货率 9.4%，曝光转化 7.4%
-· 抽纸家庭装：周GMV 121,350，退货率 11.7%，曝光转化 16.2%
-· 半成品净菜：周GMV 112,879，退货率 11.8%，曝光转化 10.9%
-· 叶菜包邮装：周GMV 109,298，退货率 4.9%，曝光转化 13.5%
-· 牙刷牙膏套装：周GMV 108,694，退货率 8.9%，曝光转化 5.5%
-
-<span class="u">用户：</span>复盘上周有哪些异常品
-异常品复盘（复盘双负：GMV 降 且 曝光转化降）：
-· 叶菜包邮装（生鲜）：GMV 115,994→109,298，曝光转化 16.0%→13.5%（双负，建议替换/优化）
-· 电热水壶（家电）：GMV 73,196→59,356，曝光转化 8.7%→7.2%（双负，建议替换/优化）
-· 空气炸锅（家电）：GMV 97,203→95,579，曝光转化 13.5%→10.2%（双负，建议替换/优化）
-
-<span class="u">用户：</span>日用品类最近销售怎么样
-品类健康度诊断：
-· 日用：GMV 3,112,574，订单 76,248，均价毛利 20.7%，退货率 7.5%，曝光转化 10.5% → 关注</pre>
-      </div>
-      <h4>配套界面 · 节前招商选品交互示意</h4>
-      <p style="color:var(--sub);font-size:13px;margin:6px 0 10px">与 Agent 配套的前端界面设计示意（case1_ui_mockup.html）：节日 / 周期范围 / GMV 分层 / 全国搜索量排序等筛选条件均可实际操作，虚拟数据演示。</p>
+    <div class="sec-sub">把三段式设计落地为可交互界面示意，验证想法能跑通</div>
+    <div class="tech-block">
+      <h4>节庆全周期选品助手 · 界面交互示意</h4>
+      <p style="color:var(--sub);font-size:14px;margin:6px 0 12px">覆盖节前自动推品 / 节中实时监控 / 节后及时复盘三段，可直接操作查看交互效果（虚拟数据演示）：选区助手自然语言指令、口径 chip、大商品池剔除、一键招商、ROI 双负调盘卡等。</p>
       <div class="cta">
-        <a class="btn btn-primary" href="agent_selection_prototype/agent_demo.html" target="_blank">在线试玩选品助手 →</a>
-        <a class="btn btn-ghost" href="case1_ui_mockup.html" target="_blank">查看界面交互示意</a>
+        <a class="btn btn-primary" href="agent_console_draft.html" target="_blank">打开三段式界面交互示意 →</a>
+        <a class="btn btn-ghost" href="case1_ui_mockup.html" target="_blank">查看「节前招商」筛选细节</a>
         <a class="btn btn-ghost" href="选品助手真原型_PRD.md">查看原型 PRD</a>
-        <a class="btn btn-ghost" href="agent_selection_prototype/README.md">运行说明</a>
-        <a class="btn btn-ghost" href="agent_selection_prototype/agent.py">查看源码</a>
       </div>
     </div>
-    <p style="margin-top:24px;padding:16px 20px;background:var(--accent-soft);border-radius:10px;font-size:14px;color:var(--ink)">完整路径：发现一线痛点 → <b>产品设计</b>（角度一）→ <b>数据验证</b>（角度二）→ <b>评估迭代</b>（角度三）→ 可运行原型落地。从业务洞察到工程实现，全流程独立完成。</p>
+    <p style="margin-top:24px;padding:16px 20px;background:var(--accent-soft);border-radius:10px;font-size:14px;color:var(--ink)">完整路径：发现一线痛点 → <b>产品设计</b>（角度一）→ <b>数据验证</b>（角度二）→ <b>评估迭代</b>（角度三）→ 界面交互示意落地。从业务洞察到可交互原型，全流程独立完成。</p>
   </div>
 </section>
 
