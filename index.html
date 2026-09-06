@@ -91,6 +91,14 @@
   .btn-ghost{border:1px solid var(--line);background:#fff;color:var(--ink)}
   footer{border-top:1px solid var(--line);padding:28px 0;color:var(--sub);font-size:13px;text-align:center}
   .contact a{margin:0 8px}
+  .tech-block{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:14px}
+  .tech-block h4{font-size:15px;margin:0 0 10px;color:var(--ink)}
+  .tech-block ul{margin:0 0 0 18px;color:var(--sub);font-size:14px}
+  .tech-block li{margin:6px 0;line-height:1.7}
+  .tech-block li b{color:var(--ink)}
+  .tech-block table{border-collapse:collapse;width:100%;margin:0;font-size:13px}
+  .tech-block th,.tech-block td{border:1px solid var(--line);padding:8px 10px;text-align:left;color:var(--sub);vertical-align:top}
+  .tech-block th{background:var(--accent-soft);color:var(--accent);font-weight:600}
   @media(max-width:720px){.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.hero h1{font-size:30px}}
 </style>
 </head>
@@ -411,49 +419,58 @@
     <h2>技术认知与商业判断</h2>
     <div class="sec-sub">同一场景，技术怎么选、风险怎么控、账怎么算</div>
 
-    <h4>技术选型：为什么 RAG + Prompt，不是微调 / 多智能体</h4>
-    <table>
-      <tr><th>方案</th><th>适用前提</th><th>本场景匹配度</th><th>结论</th></tr>
-      <tr><td>微调 Fine-tuning</td><td>规则隐式、无现成知识可检索、需模型内化领域能力</td><td>低：口径/筛选条件是显式规则，数据日更、规则随节庆变，无稳定标注集</td><td>不采用</td></tr>
-      <tr><td>多智能体 Multi-agent</td><td>任务真正并行独立、需多方协商</td><td>低：单用户单 loop（选品→监控→复盘），一个 tool-use Agent 即可，多体只增协调成本与时延</td><td>不采用</td></tr>
-      <tr><td>RAG + Prompt</td><td>事实需引用实时/内部数据、规则可写清</td><td>高：销售/库存/毛利来自内部 API 实时查；规则用 Prompt 落地；历史复盘进 RAG</td><td>采用</td></tr>
-    </table>
-    <p><b>选型原则</b>：能写清规则的用 Prompt，写不清但能检索的用 RAG，写不清也搜不到的才考虑微调；任务不真正并行就不上多智能体。</p>
+    <div class="tech-block">
+      <h4>为什么是 RAG + Prompt，而不是微调 / 多智能体</h4>
+      <table>
+        <tr><th>方案</th><th>适用前提</th><th>本场景匹配度</th><th>结论</th></tr>
+        <tr><td>微调 Fine-tuning</td><td>规则隐式、无现成知识可检索、需模型内化领域能力</td><td>低：口径/筛选条件是显式规则，数据日更、规则随节庆变，无稳定标注集</td><td>不采用</td></tr>
+        <tr><td>多智能体 Multi-agent</td><td>任务真正并行独立、需多方协商</td><td>低：选品→监控→复盘是单用户单循环，一个 Agent 配工具调用就够，多体只增协调成本</td><td>不采用</td></tr>
+        <tr><td>RAG + Prompt</td><td>事实需引用实时/内部数据、规则可写清</td><td>高：销售/库存/毛利来自内部接口实时查；规则用 Prompt 落地；历史复盘进 RAG</td><td>采用</td></tr>
+      </table>
+    </div>
 
-    <h4>控幻觉与可控性</h4>
-    <ul>
-      <li><b>知识源白名单</b>：Agent 只查已授权内部 API / RAG 文档，业务事实不联网、不编；外部搜索量走内部趋势平台或授权数据，不爬。</li>
-      <li><b>引用强制</b>：每个数字带来源（出自哪张表/哪个接口），UI 可展开"依据"核对——呼应节前/节中"结论置顶、依据可展开"的设计。</li>
-      <li><b>人工兜底</b>：Agent 出初稿、采销做终稿；一键招商是人工确认点，调盘建议需采销拍板才执行，异常才打扰、不自动改价。</li>
-    </ul>
+    <div class="tech-block">
+      <h4>怎么控幻觉、保证可控</h4>
+      <ul>
+        <li><b>数据只走授权来源</b>：业务数字来自已授权的内部接口与历史复盘库，不联网现编；外部搜索热度走内部的高搜索趋势平台或授权数据，不爬第三方。</li>
+        <li><b>每个数字带出处</b>：结论可展开"依据"，点开能看到数字来自哪张表、哪个接口，方便核对。</li>
+        <li><b>人做最后一道关</b>：Agent 出初稿、采销做终稿；一键招商是确认点，调盘建议要采销拍板才执行，异常才提醒、不自动改价。</li>
+      </ul>
+    </div>
 
-    <h4>质量 — 成本 — 时延 权衡</h4>
-    <ul>
-      <li><b>质量</b>：RAG+Prompt+引用，达到"决策辅助"所需准确度；本工具是辅助不是自动驾驶，不追零幻觉，追可解释、可核对。</li>
-      <li><b>成本</b>：无训练/GPU 微调开销，仅 API 调用 + RAG 存储；低于微调，也低于多智能体编排。</li>
-      <li><b>时延</b>：单 Agent + 数次工具调用，亚分钟级；选品/复盘非实时交易，节中监控可异步批量跑，不卡单次请求。</li>
-    </ul>
-    <p><b>权衡结论</b>：不追"全自动零延迟"，追"决策准、可解释、成本低"——用户是决策辅助，不是高频实时交易。</p>
+    <div class="tech-block">
+      <h4>质量、成本、速度怎么权衡</h4>
+      <ul>
+        <li><b>质量</b>：RAG + Prompt + 带出处，达到"辅助决策"够用的准确度；工具是帮手不是替身，不追求零出错，追求说得清、能核对。</li>
+        <li><b>成本</b>：没有训练开销，只有接口调用与存储，低于微调和多智能体编排。</li>
+        <li><b>速度</b>：选品和复盘不是实时交易，节中监控按批跑即可；外部搜索热度走内部平台，不卡单次请求。重点在节中双负早发现，减少"让利还少卖"的亏损。</li>
+      </ul>
+    </div>
 
-    <h4>真上线：数据从哪来、隐私合规怎么处理</h4>
-    <ul>
-      <li><b>数据来源</b>：销售/库存/毛利/商家信息经内部 API（已在设计中）；历史复盘存 RAG；外部搜索量走内部趋势平台或第三方授权数据，不爬。</li>
-      <li><b>隐私合规</b>：商家供价/信息属商业机密，内部权限隔离 + 脱敏；模型调用走不自留数据的 API 或自部署，不入第三方训练；采销视角只读，不暴露 C 端用户隐私；符合数据安全法与平台内部合规。</li>
-    </ul>
+    <div class="tech-block">
+      <h4>真上线：数据从哪来、合规怎么处理</h4>
+      <ul>
+        <li><b>数据来源</b>：销售/库存/毛利/商家信息走内部接口（已在设计中）；历史复盘进 RAG；外部搜索热度走内部的高搜索趋势平台或授权数据，不爬。</li>
+        <li><b>隐私合规</b>：商家供价与信息属商业机密，内部权限隔离并脱敏；模型调用走不自留数据的接口或自部署，不进第三方训练；采销视角只读，不暴露 C 端用户隐私。</li>
+      </ul>
+    </div>
 
-    <h4>商业 &amp; ROI 视角</h4>
-    <ul>
-      <li><b>价值</b>：选品排期 8h→3h（设计目标）；招商采纳率 &gt;70%；节中双负早干预，减少"让利还少卖"亏损。</li>
-      <li><b>ROI（设计预期测算）</b>：人力节省 × 频次 + 减少的损耗，对比研发/推理成本。单采销每周期省 5h × 年 N 周期；双负品早干预 3 天可减少部分亏损。</li>
-      <li><b>商业化判断</b>：对内工具看"省 + 赚"双逻辑——省人力、降损耗，选品质量↑带动 GMV↑；不直接创收，但损耗与效率即利润。</li>
-    </ul>
+    <div class="tech-block">
+      <h4>商业 &amp; ROI 视角</h4>
+      <ul>
+        <li><b>价值</b>：选品排期 8h→3h（设计目标）；招商采纳率 &gt;70%；节中双负早干预，减少"让利还少卖"的亏损。</li>
+        <li><b>ROI（设计预期测算）</b>：人力节省 × 频次 + 减少的损耗，对比研发与推理成本。单采销每周期省 5h × 年 N 周期；双负品早干预 3 天可减少部分亏损。</li>
+        <li><b>判断</b>：对内工具看"省 + 赚"——省人力、降损耗，选品质量带动 GMV；不直接创收，但损耗与效率本身就是利润。</li>
+      </ul>
+    </div>
 
-    <h4>取舍表达</h4>
-    <ul>
-      <li><b>明确砍掉</b>：全自动替代（保留采销拍板）、多智能体（协调成本）、微调（无标注/规则易变）、硬实时（异步够用）、C 端个性化（不在 scope）。</li>
-      <li><b>保留的</b>：单 Agent + tool-use、RAG 引用、人工兜底、异常才打扰。</li>
-      <li><b>一句话</b>：把复杂度留在可控处，把简单留给用户——能写清的规则不让模型猜，能异步的不占实时，能人工确认的不过度自动化。</li>
-    </ul>
+    <div class="tech-block">
+      <h4>做了哪些取舍</h4>
+      <ul>
+        <li><b>砍掉的</b>：全自动替代采销（保留拍板）、多智能体、微调、硬实时、C 端个性化。</li>
+        <li><b>保留的</b>：单 Agent + 工具调用、结果带出处、人工兜底、异常才打扰。</li>
+      </ul>
+    </div>
   </div>
 </section>
 
