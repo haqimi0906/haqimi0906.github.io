@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>节庆选品 Agent · 控制台（概念原型 · 节前对齐 PRD）</title>
+<style>
+:root{
+  --bg:#F5F8FC; --card:#FFFFFF; --line:#E3EBF4; --ink:#1B2733; --sub:#5F6B7A;
+  --hint:#93A1B0; --blue:#378ADD; --blue-d:#185FA5; --blue-l:#E8F1FB;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:14px;line-height:1.6}
+.wrap{max-width:980px;margin:0 auto;padding:32px 20px 60px}
+h1{font-size:20px;font-weight:500;margin:0 0 6px}
+.lede{color:var(--sub);font-size:13px;margin:0 0 24px}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:8px 16px;border:0.5px solid var(--line);background:var(--card);
+  border-radius:8px;cursor:pointer;font-size:13px;color:var(--sub);font-family:inherit}
+.tab.on{background:var(--blue-d);border-color:var(--blue-d);color:#fff}
+.summary{background:var(--blue-l);border-left:5px solid var(--blue);
+  border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:14px;color:var(--blue-d)}
+.card{background:var(--card);border:0.5px solid var(--line);border-radius:12px;
+  padding:18px 20px;margin-bottom:14px;transition:opacity .2s}
+.card.handled{opacity:.5}
+.chead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.tag{font-size:12px;color:var(--blue-d);background:var(--blue-l);
+  padding:2px 9px;border-radius:5px}
+.ctitle{font-size:15px;font-weight:500;margin:0}
+.why{color:var(--sub);font-size:13px;margin:0 0 14px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.acts button{padding:6px 14px;border:0.5px solid var(--line);background:var(--card);
+  border-radius:7px;cursor:pointer;font-size:13px;color:var(--ink);font-family:inherit}
+.acts button:hover{border-color:var(--blue);color:var(--blue-d)}
+.acts button:disabled{cursor:default;color:var(--hint);border-color:var(--line);background:#FAFCFE}
+details{margin-top:14px;border-top:0.5px solid var(--line);padding-top:12px}
+summary{cursor:pointer;color:var(--hint);font-size:12px;outline:none}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}
+th,td{text-align:left;padding:6px 8px;border-bottom:0.5px solid var(--line)}
+th{color:var(--hint);font-weight:400}
+
+.nl{display:flex;gap:8px;background:var(--card);border:0.5px solid var(--line);
+  border-radius:12px;padding:14px 16px;margin-bottom:14px;align-items:center}
+.nl input{flex:1;min-width:180px;padding:8px 12px;border:0.5px solid var(--line);
+  border-radius:8px;font-size:13px;font-family:inherit;color:var(--ink)}
+.nl button{padding:8px 16px;background:var(--blue-d);color:#fff;border:none;
+  border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit;white-space:nowrap}
+
+.wb{background:var(--card);border:0.5px solid var(--line);border-radius:12px;
+  padding:18px 20px;margin-bottom:14px}
+.wb h3{font-size:14px;font-weight:500;margin:0 0 4px}
+.note{color:var(--hint);font-size:12px;margin:0 0 12px}
+.fbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;font-size:12px}
+.fbar select,.fbar input{padding:5px 9px;border:0.5px solid var(--line);border-radius:7px;
+  font-size:12px;font-family:inherit;color:var(--ink);background:var(--card)}
+.fl{color:var(--hint)}
+.seg{display:inline-flex;border:0.5px solid var(--line);border-radius:7px;overflow:hidden}
+.seg b{padding:5px 11px;font-weight:400;cursor:pointer;font-size:12px;color:var(--sub)}
+.seg b.on{background:var(--blue-l);color:var(--blue-d)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}
+.chip{font-size:12px;padding:5px 11px;border:0.5px solid var(--line);border-radius:16px;
+  cursor:pointer;background:#FAFCFE;color:var(--sub);font-family:inherit}
+.chip.on{background:var(--blue-l);border-color:var(--blue);color:var(--blue-d)}
+.fbar2{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 14px;font-size:12px}
+.sm{width:112px;padding:5px 9px;border:0.5px solid var(--line);border-radius:7px;
+  font-size:12px;font-family:inherit;color:var(--ink)}
+.sheet-tabs{display:flex;gap:6px;margin-top:6px}
+.sheet-tabs b{padding:6px 14px;border:0.5px solid var(--line);border-radius:8px;
+  cursor:pointer;font-weight:400;font-size:13px;color:var(--sub);background:#FAFCFE}
+.sheet-tabs b.on{background:var(--blue-l);color:var(--blue-d);border-color:var(--blue)}
+.tw{overflow-x:auto;border:0.5px solid var(--line);border-radius:8px;margin-top:10px}
+.tw table{margin:0;min-width:920px}
+.ptab th,.ptab td{text-align:left;padding:7px 8px;border-bottom:0.5px solid var(--line);white-space:nowrap}
+.ptab th{color:var(--hint);font-weight:400}
+.mini{padding:4px 10px;border:0.5px solid var(--line);background:var(--card);
+  border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;color:var(--ink);white-space:nowrap}
+.mini.done{color:var(--blue-d);border-color:var(--blue);background:var(--blue-l)}
+.mini:disabled{color:var(--hint);cursor:default}
+.row-off{opacity:.4}
+.bar{display:flex;align-items:center;justify-content:space-between;
+  margin-top:16px;padding-top:14px;border-top:0.5px solid var(--line)}
+.bar b{font-size:15px}
+.cta{padding:8px 18px;background:var(--blue-d);color:#fff;border:none;
+  border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit}
+.msg{font-size:12px;color:var(--blue-d);margin:10px 0 0}
+.foot{margin-top:28px;padding:14px;border:0.5px dashed var(--line);
+  border-radius:8px;color:var(--hint);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>节庆选品 Agent · 控制台</h1>
+  <p class="lede">面向采销的节庆全周期选品助手 · 节前自动推品 / 节中实时监控 / 节后及时复盘 · Agent 出初稿，采销做终稿</p>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="summary" id="summary"></div>
+  <main id="cards"></main>
+
+  <div class="foot">
+    本页为概念原型，全部指标为设计预期 / 虚拟数据，非真实业务结果。
+  </div>
+</div>
+
+<script>
+var STAGES = [
+  {
+    key:'before', label:'节前 · 自动推品', time:'开学季 T-30', nl:true, workbench:true,
+    summary:'开学季建议招商 12 个品，预计补 GMV 缺口 ¥38 万。清单已按最优口径生成，可直接确认，也可逐条改。',
+    cards:[
+      {
+        tag:'推品结论', title:'建议招商清单已生成 · 12 个品',
+        why:'本卖场缺货 + 现存商家 + 同品供价最低；去年开学季 GMV 前 30%；全国搜索量均值 +18%。',
+        acts:['采纳清单','调整口径','忽略'],
+        head:['商品','去年日均 GMV','搜索量环比','商家状态'],
+        rows:[['A 品牌文具套装','¥12,400','+18.3%','已合作'],['B 坚果礼盒','¥9,800','+12.1%','新商家'],['C 收纳箱','¥7,200','+24.6%','待开发']]
+      },
+      {
+        tag:'结构缺口', title:'价格带缺口 · 文具套装 30-50 元档缺 3 个品',
+        why:'竞对该价格带 SKU 数为本卖场 2.4 倍，该档去年贡献类目 GMV 22%；50-80 元档亦缺 2 个，礼盒档反而过密。',
+        acts:['补齐缺口','查看同类','忽略'],
+        head:['价格带','本卖场 SKU','竞对 SKU','缺口'],
+        rows:[['30-50 元','4','10','6'],['50-80 元','7','9','2'],['80 元以上','6','5','0（过密）']]
+      }
+    ]
+  },
+  {
+    key:'during', label:'节中 · 实时监控', time:'开学季 开卖 Day 3',
+    summary:'今日 2 类异常需决策：ROI 双负 3 个品需调盘，销量异动 1 个品；其余 47 个品运行正常（无异常不打扰）。',
+    cards:[
+      {
+        tag:'ROI 双负', title:'ROI 双负 · 需调盘 · 3 个品',
+        why:'ROI = GMV 变化率 / 收益率变化差值。双负即 GMV 变化率与收益率变化同时为负——让利还少卖：让出去的利润没换回销量，需及时调盘（调整售价）。',
+        acts:['调盘（调整售价）','换品','忽略'],
+        head:['商品','销量变化','GMV 变化率','收益率变化','ROI','判定'],
+        rows:[
+          ['A 品牌文具套装','-8.2%','-12.4%','-2.1pct','5.9','让利还少卖 · 需调盘'],
+          ['B 坚果礼盒','-5.1%','-9.7%','-1.6pct','6.1','让利还少卖 · 需调盘'],
+          ['F 护眼台灯','-3.4%','-6.2%','-0.9pct','6.9','让利还少卖 · 需调盘']
+        ]
+      },
+      {
+        tag:'销量异动', title:'销量异动 · 1 个品',
+        why:'D 儿童书包 3 日销量 +186%，远超预期，库存可售 1.8 天。爆量品可上调售价控量，同步跟进供给。',
+        acts:['调盘（上调售价）','补货','忽略'],
+        head:['商品','销量变化','GMV 变化率','收益率变化','库存可售','判定'],
+        rows:[['D 儿童书包','+186%','+142%','+3.2pct','1.8 天','爆量 · 可上调售价控量']]
+      },
+      {
+        tag:'让利有效', title:'让利有效 · 保持 · 5 个品',
+        why:'收益率下降但 GMV 明显增长，让利换来了销量，属健康状态，维持现价，无需干预。',
+        acts:['查看明细','忽略'],
+        head:['商品','销量变化','GMV 变化率','收益率变化','ROI','判定'],
+        rows:[['C 收纳箱','+42%','+38%','-1.2pct','31.7','让利有效 · 保持'],['E 保温杯','+27%','+21%','-0.8pct','26.3','让利有效 · 保持']]
+      }
+    ]
+  },
+  {
+    key:'after', label:'节后 · 及时复盘', time:'开学季 结束 Day 1',
+    summary:'本期 GMV ¥1,240 万，同比 +12%；押对 9 个品，押错 3 个。复盘结论已生成。',
+    cards:[
+      {
+        tag:'复盘结论', title:'复盘已生成 · 押对 9 个 / 押错 3 个',
+        why:'押对品贡献 71% GMV；押错品滞销率 62%，集中在 50 元以上礼盒档，该档明年开局应压缩。',
+        acts:['查看复盘','导出','忽略'],
+        head:['分组','品数','GMV 贡献','滞销率'],
+        rows:[['押对品','9','71%','6%'],['押错品','3','9%','62%'],['平销品','6','20%','28%']]
+      },
+      {
+        tag:'下节预生成', title:'年货节清单已预生成 · 15 个品',
+        why:'基于本次复盘结论 + 年货节历史数据；已自动剔除本次押错的礼盒档，保留高动销价格带。',
+        acts:['查看清单','调整','忽略'],
+        head:['商品','入选依据','来源'],
+        rows:[['H 春联套装','去年 GMV 前 10%','历史继承'],['I 干果礼盒','搜索量 +32%','趋势新增'],['J 红色收纳','本次押对品复用','复盘继承']]
+      }
+    ]
+  }
+];
+
+var CAL = [
+  {k:'本卖场缺货',on:true},{k:'现存商家',on:true},{k:'同品供价最低',on:true}
+];
+
+var POOL = [
+  {id:'SKU-10231',name:'A 品牌文具套装',brand:'晨光',cat:'文具',gmv:'¥12,400',tier:'前 20%',margin:'18.2%',units:'1,240',search:'+18.3%',vendor:'晨光文具 · 已合作',sel:true,off:false},
+  {id:'SKU-10455',name:'B 坚果礼盒',brand:'三只松鼠',cat:'食品',gmv:'¥9,800',tier:'前 20%',margin:'21.5%',units:'860',search:'+12.1%',vendor:'松鼠供应链 · 新商家',sel:true,off:false},
+  {id:'SKU-10782',name:'C 收纳箱',brand:'太力',cat:'日用',gmv:'¥7,200',tier:'前 50%',margin:'24.1%',units:'640',search:'+24.6%',vendor:'太力家居 · 待开发',sel:true,off:false},
+  {id:'SKU-10903',name:'D 儿童书包',brand:'卡拉羊',cat:'文具',gmv:'¥6,900',tier:'前 50%',margin:'19.8%',units:'520',search:'+31.2%',vendor:'卡拉羊 · 已合作',sel:false,off:false},
+  {id:'SKU-11044',name:'E 保温杯',brand:'膳魔师',cat:'日用',gmv:'¥5,400',tier:'前 50%',margin:'22.3%',units:'410',search:'-3.4%',vendor:'膳魔师代理 · 新商家',sel:false,off:false},
+  {id:'SKU-11220',name:'F 护眼台灯',brand:'欧普',cat:'家电',gmv:'¥4,100',tier:'后 50%',margin:'16.7%',units:'260',search:'+9.8%',vendor:'欧普照明 · 待开发',sel:false,off:false}
+];
+
+var baseCount = 9;
+var cur = 0;
+var sheet = 'pool';
+
+function count(){ return baseCount + POOL.filter(function(p){ return p.sel; }).length; }
+function selCount(){ return POOL.filter(function(p){ return p.sel; }).length; }
+
+function renderTabs(){
+  var box = document.getElementById('tabs');
+  box.innerHTML = '';
+  STAGES.forEach(function(s,i){
+    var b = document.createElement('button');
+    b.className = 'tab' + (i===cur ? ' on' : '');
+    b.textContent = s.label + ' · ' + s.time;
+    b.onclick = function(){ cur = i; renderTabs(); renderCards(); };
+    box.appendChild(b);
+  });
+}
+
+function cardHTML(c){
+  var t = '<table><tr>';
+  c.head.forEach(function(h){ t += '<th>' + h + '</th>'; });
+  t += '</tr>';
+  c.rows.forEach(function(r){
+    t += '<tr>';
+    r.forEach(function(v){ t += '<td>' + v + '</td>'; });
+    t += '</tr>';
+  });
+  t += '</table>';
+  return '<div class="card">' +
+    '<div class="chead"><span class="tag">' + c.tag + '</span>' +
+    '<p class="ctitle">' + c.title + '</p></div>' +
+    '<p class="why">' + c.why + '</p>' +
+    '<div class="acts"></div>' +
+    '<details><summary>查看依据数据（Agent 已算完，仅供核对）</summary>' + t + '</details>' +
+    '</div>';
+}
+
+function nlHTML(){
+  return '<div class="nl">' +
+    '<span class="fl" style="white-space:nowrap">选区助手</span>' +
+    '<input id="nlq" value="帮我准备开学季、本卖场缺、供价有优势的节庆爆品" />' +
+    '<button id="nlbtn">解析为筛选条件</button>' +
+  '</div>';
+}
+
+function workbenchHTML(){
+  return '<div class="wb">' +
+    '<h3>自定义工作区</h3>' +
+    '<p class="note">流程：选节日 → 出池 → 剔除 → 自定义清单 → 一键招商。口径由 Agent 预填，每一项都能改；不想改就直接拉到底一键招商。</p>' +
+    '<div class="fbar">' +
+      '<span class="fl">节日</span><select><option>开学季</option><option>中秋</option><option>国庆</option><option>年货节</option><option>自定义</option></select>' +
+      '<span class="fl">周期范围</span><input value="节前 30 天" style="width:92px" />' +
+      '<span class="fl">GMV 分层</span><span class="seg" id="f-gmv"><b data-v="all">全部</b><b data-v="top50">前 50%</b><b class="on" data-v="top20">前 20%</b></span>' +
+      '<span class="fl">全国搜索量</span><span class="seg" id="f-sort"><b class="on" data-v="desc">降序</b><b data-v="asc">升序</b></span>' +
+    '</div>' +
+    '<div class="chips" id="chips"></div>' +
+    '<div class="fbar2">' +
+      '<span class="fl">商品名称</span><input class="sm" placeholder="搜索名称" />' +
+      '<span class="fl">品牌</span><input class="sm" placeholder="搜索品牌" />' +
+      '<span class="fl">类目</span><select><option>全部</option><option>文具</option><option>食品</option><option>日用</option><option>家电</option></select>' +
+    '</div>' +
+    '<div class="sheet-tabs">' +
+      '<b class="on" data-s="pool">大商品池</b>' +
+      '<b data-s="list">自定义清单 <span id="lcnt">' + count() + '</span></b>' +
+    '</div>' +
+    '<div class="tw" id="poolwrap"><table class="ptab" id="pool">' +
+      '<thead><tr><th>商品 id</th><th>名称</th><th>品牌</th><th>类目</th><th>日均 GMV</th><th>GMV 分层</th><th>平均毛利</th><th>销售件数</th><th>搜索量环比</th><th>商家信息</th><th>操作</th></tr></thead>' +
+      '<tbody></tbody></table></div>' +
+    '<div class="tw" id="listwrap" style="display:none"><table class="ptab" id="list">' +
+      '<thead><tr><th>商品 id</th><th>名称</th><th>品牌</th><th>日均 GMV</th><th>商家信息</th><th>操作</th></tr></thead>' +
+      '<tbody></tbody></table></div>' +
+    '<p class="note" style="margin:10px 0 0">清单共 ' + count() + ' 个品：本池已选 ' + selCount() + ' 个，另有 ' + baseCount + ' 个来自 Agent 建议（未在本池展示）。</p>' +
+    '<div class="bar"><div>自定义清单：<b id="cnt">' + count() + '</b> 个品</div>' +
+    '<button class="cta" id="invite">一键招商</button></div>' +
+    '<p class="msg" id="msg"></p>' +
+  '</div>';
+}
+
+function renderChips(){
+  var box = document.getElementById('chips');
+  if(!box) return;
+  box.innerHTML = '';
+  CAL.forEach(function(c,i){
+    var s = document.createElement('span');
+    s.className = 'chip' + (c.on ? ' on' : '');
+    s.textContent = c.k;
+    s.onclick = function(){
+      CAL[i].on = !CAL[i].on;
+      renderChips();
+      msg('口径已更新：' + (CAL[i].on ? '纳入 ' : '取消 ') + c.k + '，池子已按新口径重跑（示意）');
+    };
+    box.appendChild(s);
+  });
+}
+
+function renderPool(){
+  var tb = document.querySelector('#pool tbody');
+  if(!tb) return;
+  tb.innerHTML = '';
+  POOL.forEach(function(p){
+    var tr = document.createElement('tr');
+    if(p.off) tr.className = 'row-off';
+    tr.innerHTML = '<td>' + p.id + '</td><td>' + p.name + '</td><td>' + p.brand + '</td><td>' + p.cat +
+      '</td><td>' + p.gmv + '</td><td>' + p.tier + '</td><td>' + p.margin + '</td><td>' + p.units +
+      '</td><td>' + p.search + '</td><td>' + p.vendor + '</td>';
+    var td = document.createElement('td');
+    var b1 = document.createElement('button');
+    b1.className = 'mini' + (p.sel ? ' done' : '');
+    b1.textContent = p.sel ? '已加入' : '加入清单';
+    b1.disabled = p.off;
+    b1.onclick = function(){ p.sel = !p.sel; refresh(); };
+    var b2 = document.createElement('button');
+    b2.className = 'mini';
+    b2.textContent = '标记不关注';
+    b2.style.marginLeft = '6px';
+    b2.disabled = p.off;
+    b2.onclick = function(){ p.off = true; p.sel = false; refresh(); };
+    td.appendChild(b1);
+    td.appendChild(b2);
+    tr.appendChild(td);
+    tb.appendChild(tr);
+  });
+}
+
+function renderList(){
+  var tb = document.querySelector('#list tbody');
+  if(!tb) return;
+  tb.innerHTML = '';
+  POOL.filter(function(p){ return p.sel; }).forEach(function(p){
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + p.id + '</td><td>' + p.name + '</td><td>' + p.brand +
+      '</td><td>' + p.gmv + '</td><td>' + p.vendor + '</td>';
+    var td = document.createElement('td');
+    var b = document.createElement('button');
+    b.className = 'mini';
+    b.textContent = '移除';
+    b.onclick = function(){ p.sel = false; refresh(); };
+    td.appendChild(b);
+    tr.appendChild(td);
+    tb.appendChild(tr);
+  });
+}
+
+function refresh(){
+  renderPool();
+  renderList();
+  var c = count();
+  var cnt = document.getElementById('cnt');
+  var lc = document.getElementById('lcnt');
+  if(cnt) cnt.textContent = c;
+  if(lc) lc.textContent = c;
+}
+
+function msg(t){
+  var m = document.getElementById('msg');
+  if(m) m.textContent = t;
+}
+
+function bindSheetTabs(){
+  var bs = document.querySelectorAll('.sheet-tabs b');
+  Array.prototype.forEach.call(bs, function(b){
+    b.onclick = function(){
+      Array.prototype.forEach.call(bs, function(x){ x.className = ''; });
+      b.className = 'on';
+      sheet = b.getAttribute('data-s');
+      document.getElementById('poolwrap').style.display = (sheet === 'pool') ? '' : 'none';
+      document.getElementById('listwrap').style.display = (sheet === 'list') ? '' : 'none';
+    };
+  });
+}
+
+function bindSeg(){
+  Array.prototype.forEach.call(document.querySelectorAll('.seg'), function(seg){
+    Array.prototype.forEach.call(seg.querySelectorAll('b'), function(b){
+      b.onclick = function(){
+        Array.prototype.forEach.call(seg.querySelectorAll('b'), function(x){ x.className = ''; });
+        b.className = 'on';
+      };
+    });
+  });
+}
+
+function bindWorkbench(){
+  renderChips();
+  refresh();
+  bindSheetTabs();
+  bindSeg();
+  var inv = document.getElementById('invite');
+  if(inv) inv.onclick = function(){ msg('已向 ' + count() + ' 个商家发起招商邀约（示意）'); };
+}
+
+function bindNL(){
+  var btn = document.getElementById('nlbtn');
+  if(btn) btn.onclick = function(){
+    msg('已解析：节日=开学季 / 本卖场缺货 / 同品供价最低 / 去年 GMV 前 30% / 搜索量降序，已同步到下方筛选条件（示意）');
+  };
+}
+
+function renderCards(){
+  var s = STAGES[cur];
+  document.getElementById('summary').textContent = s.summary;
+  var main = document.getElementById('cards');
+  main.innerHTML = '';
+  if(s.nl){
+    var n = document.createElement('div');
+    n.innerHTML = nlHTML();
+    main.appendChild(n.firstChild);
+    bindNL();
+  }
+  s.cards.forEach(function(c){
+    var d = document.createElement('div');
+    d.innerHTML = cardHTML(c);
+    var card = d.firstChild;
+    var bar = card.querySelector('.acts');
+    c.acts.forEach(function(a){
+      var b = document.createElement('button');
+      b.textContent = a;
+      b.onclick = function(){
+        Array.prototype.forEach.call(bar.children, function(x){ x.disabled = true; });
+        b.textContent = '已' + a;
+        b.disabled = true;
+        card.className = 'card handled';
+      };
+      bar.appendChild(b);
+    });
+    main.appendChild(card);
+  });
+  if(s.workbench){
+    var w = document.createElement('div');
+    w.innerHTML = workbenchHTML();
+    main.appendChild(w.firstChild);
+    bindWorkbench();
+  }
+}
+
+renderTabs();
+renderCards();
+</script>
+</body>
+</html>
