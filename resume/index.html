@@ -72,7 +72,7 @@
   .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;}
   @media print{
     body{background:#fff;padding:0;}
-    .bar,.hint{display:none !important;}
+    .bar,.hint,#toast{display:none !important;}
     .page{box-shadow:none;border:none;border-radius:0;max-width:100%;}
     .hd{background:#2f6fb3 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
     .pos,.item,.pill,.m,.sec-t .dot{ -webkit-print-color-adjust:exact;print-color-adjust:exact;}
@@ -115,7 +115,8 @@
   }
   function saveLocal(){ try{localStorage.setItem(KEY,page.innerHTML);flash('✅ 已保存到本机');}catch(e){flash('⚠️ 保存失败');} }
   function resetLocal(){ if(confirm('还原为初始版本？本地修改将丢失。')){ localStorage.removeItem(KEY); location.reload(); } }
-  let t; function flash(msg){ const h=document.querySelector('.hint'); const old=h.textContent; h.textContent=msg; h.style.color='#1f8a5b'; clearTimeout(t); t=setTimeout(()=>{h.textContent=old;h.style.color='';},1800); }
+  function toast(msg){ let el=document.getElementById('toast'); if(!el){ el=document.createElement('div'); el.id='toast'; el.style.cssText='position:fixed;left:50%;top:22px;transform:translateX(-50%) translateY(-8px);background:rgba(31,138,91,.96);color:#fff;padding:10px 20px;border-radius:24px;font-size:13.5px;font-weight:700;z-index:999;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;transition:opacity .22s ease,transform .22s ease;pointer-events:none;'; document.body.appendChild(el); } el=document.getElementById('toast'); el.textContent=msg; requestAnimationFrame(()=>{ el.style.opacity='1'; el.style.transform='translateX(-50%) translateY(0)'; }); clearTimeout(el._t); el._t=setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(-50%) translateY(-8px)'; },1800); }
+  function flash(msg){ toast(msg); }
   function download(txt,name){ const b=new Blob([txt],{type:'text/html;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
   function copyText(txt){ if(document.body.classList.contains('editing')) return; const ok=()=>flash('📋 已复制：'+txt); const fail=()=>flash('⚠️ 复制失败，请手动选择'); if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(ok).catch(()=>fallbackCopy(txt,ok,fail)); } else { fallbackCopy(txt,ok,fail); } }
   function fallbackCopy(txt,ok,fail){ try{ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); ok(); }catch(e){ fail(); } }
