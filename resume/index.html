@@ -34,6 +34,8 @@
   .cp{cursor:pointer;}
   .hd .contact .cp{border-bottom:1px dashed rgba(255,255,255,.55);}
   .hd .contact .cp:hover{color:#fff;}
+  .hd .contact .cp-hint{font-size:11px;opacity:.65;margin-left:3px;border:1px solid rgba(255,255,255,.4);border-radius:11px;padding:0 7px;transition:.15s;white-space:nowrap;}
+  .hd .contact .cp:hover .cp-hint{opacity:1;border-color:#fff;background:rgba(255,255,255,.16);}
   .sec-t{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:800;color:var(--accent);padding-bottom:10px;margin-bottom:14px;border-bottom:2px solid var(--accent-bg);}
   .sec-t .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-bg);}
   .ent{margin-bottom:18px;}
@@ -94,7 +96,7 @@
     <div class="name">王静雨</div>
     <div class="role">求职意向： AI 产品经理</div>
     <div class="contact"><span>📞 18403300517</span>
-      <span class="cp" onclick="copyText('wangjingyu0517@163.com')" title="点击复制邮箱">✉️ <span class="cp-t">wangjingyu0517@163.com</span></span>
+      <span class="cp" onclick="copyText('wangjingyu0517@163.com')" title="点击复制邮箱">✉️ <span class="cp-t">wangjingyu0517@163.com</span> <span class="cp-hint">📋 点击复制</span></span>
       <span>📍 厦门</span>
       <span>🔗 <a href="https://haqimi0906.github.io/" target="_blank">AI 产品经理作品集</a></span></div>
   </div>
@@ -115,7 +117,7 @@
   }
   function saveLocal(){ try{localStorage.setItem(KEY,page.innerHTML);flash('✅ 已保存到本机');}catch(e){flash('⚠️ 保存失败');} }
   function resetLocal(){ if(confirm('还原为初始版本？本地修改将丢失。')){ localStorage.removeItem(KEY); location.reload(); } }
-  function toast(msg){ let el=document.getElementById('toast'); if(!el){ el=document.createElement('div'); el.id='toast'; el.style.cssText='position:fixed;left:50%;top:22px;transform:translateX(-50%) translateY(-8px);background:rgba(31,138,91,.96);color:#fff;padding:10px 20px;border-radius:24px;font-size:13.5px;font-weight:700;z-index:999;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;transition:opacity .22s ease,transform .22s ease;pointer-events:none;'; document.body.appendChild(el); } el=document.getElementById('toast'); el.textContent=msg; requestAnimationFrame(()=>{ el.style.opacity='1'; el.style.transform='translateX(-50%) translateY(0)'; }); clearTimeout(el._t); el._t=setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(-50%) translateY(-8px)'; },1800); }
+  function toast(msg){ let el=document.getElementById('toast'); if(!el){ el=document.createElement('div'); el.id='toast'; el.style.cssText='position:fixed;left:50%;top:22px;transform:translateX(-50%) translateY(-8px);background:linear-gradient(120deg,#2f6fb3,#5b9bd5);color:#fff;padding:10px 20px;border-radius:24px;font-size:13.5px;font-weight:700;z-index:999;box-shadow:0 6px 20px rgba(47,111,179,.35);opacity:0;transition:opacity .22s ease,transform .22s ease;pointer-events:none;'; document.body.appendChild(el); } el=document.getElementById('toast'); el.textContent=msg; requestAnimationFrame(()=>{ el.style.opacity='1'; el.style.transform='translateX(-50%) translateY(0)'; }); clearTimeout(el._t); el._t=setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(-50%) translateY(-8px)'; },1800); }
   function flash(msg){ toast(msg); }
   function download(txt,name){ const b=new Blob([txt],{type:'text/html;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; a.click(); URL.revokeObjectURL(a.href); }
   function copyText(txt){ if(document.body.classList.contains('editing')) return; const ok=()=>flash('📋 已复制：'+txt); const fail=()=>flash('⚠️ 复制失败，请手动选择'); if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(ok).catch(()=>fallbackCopy(txt,ok,fail)); } else { fallbackCopy(txt,ok,fail); } }
