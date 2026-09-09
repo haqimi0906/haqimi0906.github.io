@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>采销双周报生成器 · 概念 Demo</title>
+<style>
+  :root{
+    --bg1:#eaf3fb; --bg2:#f7fbff; --card:#ffffff; --blue:#2f6fb3; --blue2:#5b9bd5;
+    --ink:#243b53; --sub:#5b748f; --line:#dbe7f2; --green:#1f8a5b; --red:#c0392b; --amber:#b9770e; --low:#3a7bb5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));color:var(--ink);min-height:100vh;padding:28px 16px;line-height:1.55;font-size:13.5px}
+  .wrap{max-width:1000px;margin:0 auto}
+  .topbar{background:linear-gradient(120deg,var(--blue),var(--blue2));color:#fff;border-radius:16px;padding:18px 22px;margin-bottom:16px;box-shadow:0 6px 22px rgba(47,111,179,.18)}
+  .topbar .badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:3px 11px;border-radius:16px;font-size:11.5px;font-weight:600;margin-bottom:8px}
+  .topbar h1{font-size:21px;margin-bottom:5px;font-weight:700}
+  .topbar p{font-size:12.5px;opacity:.92}
+  .ctrl{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px;
+    box-shadow:0 4px 18px rgba(47,111,179,.06);display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end}
+  .fld{display:flex;flex-direction:column;gap:5px}
+  .fld label{font-size:11.5px;color:var(--sub);font-weight:600}
+  .fld input[type=date],.fld select{padding:8px 11px;border:1px solid var(--line);border-radius:9px;font-size:12.5px;color:var(--ink);background:#fbfdff}
+  .fld select{width:230px}
+  button{cursor:pointer;border:none;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;
+    background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.45);transition:.15s}
+  button:hover{background:rgba(255,255,255,.28)}
+  .ctrl button{background:linear-gradient(120deg,var(--blue),var(--blue2));color:#fff;border:none}
+  .ctrl button:hover{filter:brightness(1.07)}
+  .loading{display:none;color:var(--blue);font-size:12.5px;margin:0 0 12px 2px;font-weight:600}
+  .tabs{display:flex;gap:8px;margin-bottom:14px}
+  .tab{padding:9px 18px;border-radius:10px;background:#eef4fb;color:var(--blue);font-weight:600;cursor:pointer;border:1px solid var(--line);font-size:13px;transition:.15s}
+  .tab.on{background:linear-gradient(120deg,var(--blue),var(--blue2));color:#fff;border-color:transparent;box-shadow:0 3px 12px rgba(47,111,179,.22)}
+  .sheet{display:none}
+  .sheet.on{display:block}
+  .block{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:14px;box-shadow:0 4px 18px rgba(47,111,179,.05)}
+  .block h2{font-size:15px;color:var(--blue);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .block h2::before{content:"";width:4px;height:16px;background:linear-gradient(var(--blue),var(--blue2));border-radius:3px;display:inline-block}
+  .block h3{font-size:13px;color:var(--sub);margin:16px 0 8px;font-weight:600}
+  .block h4{font-size:12.5px;color:var(--blue);margin:14px 0 6px;font-weight:700}
+  /* 统一表格样式：满宽、居中、表头渐变、斑马纹 */
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
+  thead th{background:linear-gradient(180deg,#eef5fc,#e4eef9);color:var(--blue);font-weight:700;font-size:12px}
+  tbody tr:nth-child(even){background:#f7fbfe}
+  tbody tr:hover{background:#eef6ff}
+  .up{color:var(--green);font-weight:700}
+  .down{color:var(--red);font-weight:700}
+  .flat{color:var(--sub)}
+  /* 两行表头 */
+  thead tr:first-child th{border-bottom:none}
+  thead tr:last-child th{border-top:2px solid var(--blue)}
+  th.group{background:linear-gradient(180deg,#e3edf8,#d7e6f5);text-align:center;font-size:11px;letter-spacing:.5px;color:var(--blue)}
+  /* 类目宽表横向滚动 + 提示 */
+  .scroll-hint{font-size:11.5px;color:var(--sub);margin:2px 0 8px}
+  .wide-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px}
+  .wide-wrap table{min-width:1180px}
+  /* 损失毛利窄表：居中、不铺满 */
+  .narrow-wrap{display:flex;justify-content:center}
+  #t-loss{width:440px}
+  /* 仓组卡片 */
+  .cz-card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0;background:#fbfdff}
+  .cz-card h4{margin-top:0}
+  /* 问题诊断 */
+  .alert-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .pill{font-size:12px;font-weight:700;padding:5px 13px;border-radius:14px}
+  .pill-h{background:rgba(192,57,43,.12);color:var(--red)}
+  .pill-m{background:rgba(185,119,14,.14);color:var(--amber)}
+  .pill-l{background:rgba(58,123,181,.13);color:var(--low)}
+  .alert{background:#fff; border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:11px 14px;margin-bottom:9px;box-shadow:0 2px 8px rgba(47,111,179,.04)}
+  .alert.high{border-left-color:var(--red)}
+  .alert.mid{border-left-color:var(--amber)}
+  .alert.low{border-left-color:var(--low)}
+  .alert .lv{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;margin-right:8px}
+  .lv-high{background:rgba(192,57,43,.13);color:var(--red)}
+  .lv-mid{background:rgba(185,119,14,.14);color:var(--amber)}
+  .lv-low{background:rgba(58,123,181,.13);color:var(--low)}
+  .alert .act{font-size:12px;color:var(--sub);margin-top:5px}
+  .muted{color:var(--sub);font-style:italic;font-size:12px;padding:12px}
+  .foot{text-align:center;color:var(--sub);font-size:11.5px;margin-top:18px}
+  .legend{display:flex;gap:14px;align-items:center;font-size:11.5px;color:var(--sub);margin:0 0 14px 2px}
+  .legend b.up{font-weight:700}.legend b.down{font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <span class="badge">概念方案推演 Demo · 报表数据为模拟拉取 · 未接真实数据源</span>
+    <h1>采销双周报生成器</h1>
+    <p>采销选日期 + 选类目包 → Agent 自动拉取报表 → 输出 Sheet1 完整双周报 + Sheet2 异常诊断。模拟真实「数据产品」工作流（vibecoding 原型）。</p>
+  </div>
+
+  <div class="ctrl">
+    <div class="fld">
+      <label>双周报起始日</label>
+      <input type="date" id="d1" value="2026-08-18">
+    </div>
+    <div class="fld">
+      <label>双周报结束日</label>
+      <input type="date" id="d2" value="2026-08-31">
+    </div>
+    <div class="fld">
+      <label>类目包（可多选）</label>
+      <select id="pkg" multiple size="3">
+        <option selected>生鲜果蔬</option><option>日用百货</option><option>数码3C</option>
+        <option>宠物生活</option><option>粮油调味</option>
+      </select>
+    </div>
+    <button onclick="run()">Agent 拉取并生成双周报</button>
+  </div>
+
+  <div class="legend">
+    <span>变化率：</span><b class="up">▲ 涨（绿）</b><b class="down">▼ 跌（红）</b>
+    <span>· ROI＝收益(收益率)×GMV 同向强化指标（概念口径）</span>
+  </div>
+
+  <div class="loading" id="load">⏳ Agent 正在按类目包拉取报表…</div>
+
+  <div class="tabs">
+    <div class="tab on" onclick="sw(1)">Sheet1 · 完整双周报</div>
+    <div class="tab" onclick="sw(2)">Sheet2 · 问题诊断</div>
+  </div>
+
+  <div class="sheet on" id="s1">
+    <div class="block">
+      <h2>一、大盘分析</h2>
+      <table id="t-dapan"></table>
+    </div>
+    <div class="block">
+      <h2>二、下探分析</h2>
+      <h3>分仓组（各仓组同大盘结构，仅拉取对应仓组数据）</h3>
+      <div id="d-cangzu"></div>
+      <h3>下探类目（采销三级类目同环比）</h3>
+      <div class="scroll-hint">← 左右滑动查看 GMV / 收益率 / 件单价 同环比与 ROI →</div>
+      <div id="t-cat"></div>
+    </div>
+    <div class="block">
+      <h2>三、商家分析</h2>
+      <h3>Top20 商家（本期 GMV / SKU 数 / 是否异常）</h3>
+      <table id="t-mch"></table>
+    </div>
+    <div class="block">
+      <h2>四、商品分析</h2>
+      <h3>损失毛利较高的 Top20 商品</h3>
+      <div class="narrow-wrap"><table id="t-loss"></table></div>
+    </div>
+  </div>
+
+  <div class="sheet" id="s2">
+    <div class="block">
+      <h2>异常报警（针对 Sheet1 异常值自动生成，开会即分析此表）</h2>
+      <div id="alerts"><p class="muted">先生成双周报，系统将自动扫描异常。</p></div>
+    </div>
+  </div>
+  <div class="foot">采销双周报生成器 · 概念方案推演 Demo ｜ 数据均为模拟，非真实上线产出</div>
+</div>
+
+<script>
+const PKGS = {
+  "生鲜果蔬":{gmv:128,profit:8.2,slot:340,mch:52,subs:["叶菜类","热带水果","菌菇干货"]},
+  "日用百货":{gmv:95,profit:6.1,slot:280,mch:41,subs:["纸品清洁","收纳整理","个护小物"]},
+  "数码3C":{gmv:76,profit:5.4,slot:120,mch:18,subs:["手机配件","智能设备","影音外设"]},
+  "宠物生活":{gmv:43,profit:4.0,slot:90,mch:22,subs:["宠物主粮","零食玩具","宠物用品"]},
+  "粮油调味":{gmv:88,profit:5.8,slot:200,mch:30,subs:["米面","食用油","调味料"]},
+};
+
+// ===== 真实仓组报表口径（用户提供的生鲜果蔬拆分，仅此有真实数据）=====
+// t: total=总量指标(随规模缩放) / intensity=强度指标(不缩放) / rate=比率(不缩放,带%)
+const RAW_CZ = [
+  {name:'仓组1', rows:[
+    {k:'综合GMV(万)',cur:78.4,prev:83.3,r1:-5.8,yoy:75,r2:4.5,t:'total'},
+    {k:'人均GMV',cur:359,prev:382,r1:-6.0,yoy:353,r2:1.7,t:'intensity'},
+    {k:'收益额(万)',cur:5,prev:5.2,r1:-3.2,yoy:4.7,r2:7.8,t:'total'},
+    {k:'收益率',cur:3.9,prev:3.9,r1:0.1,yoy:4,r2:-2.5,t:'rate'},
+    {k:'件单价',cur:41.9,prev:41.2,r1:1.7,yoy:42.6,r2:-1.6,t:'intensity'},
+    {k:'动销坑位',cur:208.2,prev:212,r1:-1.8,yoy:203.2,r2:2.5,t:'total'},
+    {k:'动销商家数',cur:32,prev:32,r1:0.0,yoy:31,r2:3.2,t:'total'},
+    {k:'技术服务费(万)',cur:0.9,prev:0.9,r1:-0.8,yoy:0.9,r2:4.5,t:'total'},
+  ]},
+  {name:'仓组2', rows:[
+    {k:'综合GMV(万)',cur:49.6,prev:52.7,r1:-5.8,yoy:47.5,r2:4.5,t:'total'},
+    {k:'人均GMV',cur:227.1,prev:241.7,r1:-6.0,yoy:223.3,r2:1.7,t:'intensity'},
+    {k:'收益额(万)',cur:3.2,prev:3.3,r1:-3.2,yoy:2.9,r2:7.8,t:'total'},
+    {k:'收益率',cur:2.5,prev:2.5,r1:0.1,yoy:2.5,r2:-2.5,t:'rate'},
+    {k:'件单价',cur:26.5,prev:26.1,r1:1.7,yoy:27,r2:-1.6,t:'intensity'},
+    {k:'动销坑位',cur:131.8,prev:134.1,r1:-1.8,yoy:128.6,r2:2.5,t:'total'},
+    {k:'动销商家数',cur:20,prev:20,r1:0.0,yoy:20,r2:0.0,t:'total'},
+    {k:'技术服务费(万)',cur:0.6,prev:0.6,r1:-0.8,yoy:0.5,r2:4.5,t:'total'},
+  ]},
+];
+function buildCangzu(scale){
+  return RAW_CZ.map(g=>({name:g.name, rows:g.rows.map(r=>{
+    const dec = r.t==='total' && r.k.includes('商家数') ? 0 : 1;
+    const m = r.t==='total' ? scale : 1;
+    return {k:r.k, cur:r.cur*m, prev:r.prev*m, yoy:r.yoy*m, r1:r.r1, r2:r.r2, unit:r.t==='rate'?'%':'', dec};
+  })}));
+}
+function rateCell(v){const cls=v>0.05?'up':v<-0.05?'down':'flat';return `<td class="${cls}">${(v>=0?'+':'')+v.toFixed(1)}%</td>`;}
+function czTable(g){
+  let h=`<table><thead><tr><th>指标</th><th>本期</th><th>环期</th><th>环比(变化率)</th><th>同期</th><th>同比(变化率)</th></tr></thead><tbody>`;
+  g.rows.forEach(r=>{
+    const f=v=>(Math.round(v*Math.pow(10,r.dec))/Math.pow(10,r.dec)).toLocaleString('zh-CN');
+    h+=`<tr><td>${r.k}</td><td>${f(r.cur)}${r.unit}</td><td>${f(r.prev)}${r.unit}</td>${rateCell(r.r1)}<td>${f(r.yoy)}${r.unit}</td>${rateCell(r.r2)}</tr>`;
+  });
+  return h+`</tbody></table>`;
+}
+
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function jit(seed,range){return ((hash(seed)%1000)/1000-0.5)*2*range;} // -range..range
+function pct(n,d){return d===0?0:(n-d)/d*100;}
+function num(n){return (Math.round(n*10)/10).toLocaleString('zh-CN');}
+function chgCell(cur,prev){const v=pct(cur,prev);const cls=v>0.5?'up':v<-0.5?'down':'flat';const s=(v>=0?'+':'')+v.toFixed(1)+'%';return `<td class="${cls}">${s}</td>`;}
+
+// ROI：收益(收益率)×GMV 同向强化指标（概念口径）
+// 同降→-99%（双负）/ 同涨→+99%（双正）/ 反向→取折中
+function roiVal(a,b){
+  if(a===0&&b===0) return 0;
+  if((a<0&&b<0)||(a>0&&b>0)) return a>0?99:-99;
+  return +(((a+b)/2).toFixed(1));
+}
+function roiCell(v){const cls=v>0?'up':v<0?'down':'flat';return `<td class="${cls}">${v>0?'+':''}${v}%</td>`;}
+
+let DATA=null;
+function run(){
+  const sel=Array.from(document.getElementById('pkg').selectedOptions).map(o=>o.value);
+  if(sel.length===0){alert('请选择至少一个类目包');return;}
+  document.getElementById('load').style.display='block';
+  setTimeout(()=>{ build(sel); document.getElementById('load').style.display='none'; sw(1); }, 700);
+}
+function build(sel){
+  const key=sel.join('|');
+  let cur={gmv:0,profit:0,slot:0,mch:0};
+  sel.forEach(p=>{const b=PKGS[p];cur.gmv+=b.gmv;cur.profit+=b.profit;cur.slot+=b.slot;cur.mch+=b.mch;});
+  const r={
+    gmv:{dp:jit(key+'gmvDP',0.10),dy:jit(key+'gmvDY',0.08)},
+    rj :{dp:jit(key+'rjDP',0.07),dy:jit(key+'rjDY',0.06)},
+    pf :{dp:jit(key+'pfDP',0.09),dy:jit(key+'pfDY',0.08)},
+    rt :{dp:jit(key+'rtDP',0.03),dy:jit(key+'rtDY',0.03)},
+    pr :{dp:jit(key+'prDP',0.05),dy:jit(key+'prDY',0.05)},
+    sl :{dp:jit(key+'slDP',0.07),dy:jit(key+'slDY',0.06)},
+    mc :{dp:jit(key+'mcDP',0.05),dy:jit(key+'mcDY',0.05)},
+    fe :{dp:jit(key+'feDP',0.08),dy:jit(key+'feDY',0.08)},
+  };
+  const curM={
+    gmv:cur.gmv,
+    rj :cur.gmv*10000/(cur.mch*42),
+    pf :cur.profit,
+    rt :cur.profit/cur.gmv*100,
+    pr :cur.gmv*10000/(cur.slot*55),
+    sl :cur.slot,
+    mc :cur.mch,
+    fe :cur.profit*0.18,
+  };
+  const prev={},yoy={};
+  for(const k in curM){prev[k]=curM[k]/(1+r[k].dp);yoy[k]=curM[k]/(1+r[k].dy);}
+  const mk=(c,p,y,rr)=>[
+    ['综合GMV(万)',c.gmv,p.gmv,rr.gmv.dp,y.gmv,rr.gmv.dy],
+    ['人均GMV',c.rj,p.rj,rr.rj.dp,y.rj,rr.rj.dy],
+    ['收益额(万)',c.pf,p.pf,rr.pf.dp,y.pf,rr.pf.dy],
+    ['收益率',c.rt,p.rt,rr.rt.dp,y.rt,rr.rt.dy,'%'],
+    ['件单价',c.pr,p.pr,rr.pr.dp,y.pr,rr.pr.dy],
+    ['动销坑位',c.sl,p.sl,rr.sl.dp,y.sl,rr.sl.dy],
+    ['动销商家数',c.mc,p.mc,rr.mc.dp,y.mc,rr.mc.dy],
+    ['技术服务费(万)',c.fe,p.fe,rr.fe.dp,y.fe,rr.fe.dy],
+  ];
+  const metrics=mk(curM,prev,yoy,r);
+  const scale = cur.gmv/128;
+  const cangzu = buildCangzu(scale);
+  DATA={sel,cur,metrics,cangzu,
+    cats:genCats(sel,cur),mch:genMch(key,cur),loss:genLoss(key,cur)};
+  render();
+}
+function genCats(sel,cur){
+  let out=[];
+  sel.forEach(p=>{const b=PKGS[p];const w=[0.4,0.35,0.25];
+    b.subs.forEach((s,i)=>{const seed=p+s;const gmv=cur.gmv*(b.gmv/cur.gmv)*w[i];
+      const dp=jit(seed+'DP',0.18),dy=jit(seed+'DY',0.15);
+      const rtdp=jit(seed+'rtDP',0.06),rtdy=jit(seed+'rtDY',0.05);
+      const prdp=jit(seed+'prDP',0.04),prdy=jit(seed+'prDY',0.04);
+      const rt=(cur.profit/cur.gmv*100)*(1+rtdp);
+      const pr=(cur.gmv*10000/(cur.slot*55))*(1+prdp);
+      const gmvO={cur:gmv, prev:gmv/(1+dp), yoy:gmv/(1+dy), r1:dp*100, r2:dy*100};
+      const rtO ={cur:rt,   prev:rt/(1+rtdp),   yoy:rt/(1+rtdy),   r1:rtdp*100, r2:rtdy*100};
+      const prO ={cur:pr,   prev:pr/(1+prdp),   yoy:pr/(1+prdy),   r1:prdp*100, r2:prdy*100};
+      out.push({
+        name:s, cat:p,
+        gmv:gmvO, rt:rtO, pr:prO,
+        roiH:roiVal(gmvO.r1, rtO.r1),
+        roiY:roiVal(gmvO.r2, rtO.r2),
+      });});});
+  return out;
+}
+function genMch(key,cur){
+  let out=[]; const base=cur.gmv/20;
+  for(let i=1;i<=20;i++){const seed=key+'mch'+i;const g=base*(1+jit(seed,0.5));const pg=g/(1+jit(seed+'DP',0.3));
+    const sku=Math.round(40+jit(seed+'sku',30));const psku=Math.round(sku/(1+jit(seed+'sDP',0.3)));
+    out.push({name:'商家'+i,gmv:g,sku,pgmv:pg,psku,anom:(g/pg-1)<-0.3||(sku-psku)/psku<-0.4});}
+  return out.sort((a,b)=>b.gmv-a.gmv);
+}
+function genLoss(key,cur){
+  let out=[]; for(let i=1;i<=20;i++){const seed=key+'loss'+i;out.push({name:'商品'+i,loss:+(cur.gmv*0.01*(1+jit(seed,0.8))).toFixed(1)});}
+  return out.sort((a,b)=>b.loss-a.loss);
+}
+function metricsTable(rows){
+  let h=`<thead><tr><th>指标</th><th>本期</th><th>环期</th><th>环比(变化率)</th><th>同期</th><th>同比(变化率)</th></tr></thead><tbody>`;
+  rows.forEach(r=>{const u=r[6]||'';
+    h+=`<tr><td>${r[0]}</td><td>${num(r[1])}${u}</td><td>${num(r[2])}${u}</td>${chgCell(r[1],r[2])}<td>${num(r[4])}${u}</td>${chgCell(r[1],r[4])}</tr>`;});
+  return h+`</tbody>`;
+}
+function render(){
+  document.getElementById('t-dapan').innerHTML=metricsTable(DATA.metrics);
+  let cz='';
+  DATA.cangzu.forEach(c=>{cz+=`<div class="cz-card"><h4>${c.name}</h4>`+czTable(c)+`</div>`;});
+  document.getElementById('d-cangzu').innerHTML=cz;
+
+  // ===== 下探类目：真实表头（GMV/收益率/件单价 各5列 + ROI 2列）=====
+  let k=`<div class="wide-wrap"><table>
+<thead><tr>
+<th rowspan="2">类目</th>
+<th colspan="5" class="group">GMV(万)</th>
+<th colspan="5" class="group">收益率(%)</th>
+<th colspan="5" class="group">件单价</th>
+<th colspan="2" class="group">ROI</th>
+</tr><tr>
+<th>本期</th><th>环期</th><th>同期</th><th>环比</th><th>同比</th>
+<th>本期</th><th>环期</th><th>同期</th><th>环比</th><th>同比</th>
+<th>本期</th><th>环期</th><th>同期</th><th>环比</th><th>同比</th>
+<th>环ROI</th><th>同ROI</th>
+</tr></thead><tbody>`;
+  DATA.cats.forEach(d=>{
+    const c=(o)=>`<td>${num(o.cur)}</td><td>${num(o.prev)}</td><td>${num(o.yoy)}</td>${rateCell(o.r1)}${rateCell(o.r2)}`;
+    k+=`<tr><td>${d.name}<br><small style="color:var(--sub)">(${d.cat})</small></td>`
+      +c(d.gmv)+c(d.rt)+c(d.pr)
+      +roiCell(d.roiH)+roiCell(d.roiY)+`</tr>`;
+  });
+  document.getElementById('t-cat').innerHTML=k;
+
+  let m=`<thead><tr><th>商家</th><th>本期GMV</th><th>环比</th><th>SKU数</th><th>SKU环比</th><th>是否异常</th></tr></thead><tbody>`;
+  DATA.mch.forEach(d=>{m+=`<tr><td>${d.name}</td><td>${num(d.gmv)}</td>${chgCell(d.gmv,d.pgmv)}<td>${d.sku}</td>${chgCell(d.sku,d.psku)}<td>${d.anom?'<span class="down">异常⚠</span>':'<span class="flat">正常</span>'}</td></tr>`;});
+  document.getElementById('t-mch').innerHTML=m+`</tbody>`;
+
+  let l=`<thead><tr><th>商品</th><th>损失毛利(万)</th></tr></thead><tbody>`;
+  DATA.loss.forEach(d=>{l+=`<tr><td>${d.name}</td><td class="${d.loss>(DATA.cur.gmv*0.015)?'down':'flat'}">${d.loss}</td></tr>`;});
+  document.getElementById('t-loss').innerHTML=l+`</tbody>`;
+
+  renderAlerts();
+}
+function renderAlerts(){
+  const A=[]; const M={}; DATA.metrics.forEach(m=>M[m[0]]=m);
+  const chg=(name)=>pct(M[name][1],M[name][2]);      // 环比
+  const yoy=(name)=>pct(M[name][1],M[name][4]);      // 同比
+  // 1. 规模：大盘 GMV 环比
+  const gDP=chg('综合GMV(万)');
+  if(gDP<-5)A.push(['high',`大盘 GMV 环比 ${gDP.toFixed(1)}%，需求端走弱`,'盘品会优先排查整体供需与招商节奏，确认季节性或竞品分流']);
+  // 2. 收益：收益率环比
+  const rtDP=chg('收益率');
+  if(rtDP<-2)A.push(['high',`收益率环比 ${rtDP.toFixed(1)}pct，毛利空间承压`,'下钻高损类目，评估补贴/供价调整空间']);
+  // 3. 客单：件单价环比
+  const prDP=chg('件单价');
+  if(prDP<-3)A.push(['mid',`件单价环比 ${prDP.toFixed(1)}%，客单价下滑`,'检查促销力度与高客单品排期是否到位']);
+  // 4. 效率：动销坑位环比
+  const slDP=chg('动销坑位');
+  if(slDP<-3)A.push(['mid',`动销坑位环比 ${slDP.toFixed(1)}%，坑位利用下降`,'核查明星品断供与排期空缺']);
+  // 5. 商家结构：Top5 集中度
+  const top5=DATA.mch.slice(0,5).reduce((s,m)=>s+m.gmv,0);
+  const cr5=top5/DATA.cur.gmv*100;
+  if(cr5>38)A.push(['mid',`商家 Top5 集中度 CR5=${cr5.toFixed(0)}%，结构偏集中`,'关注头部商家波动对大盘的放大风险，分散供给']);
+  // 6. 仓组分化：两仓组 GMV 环比差
+  const cz=DATA.cangzu;
+  if(cz.length>=2){const d=cz[0].rows.find(r=>r.k.includes('GMV')).r1 - cz[1].rows.find(r=>r.k.includes('GMV')).r1;
+    if(Math.abs(d)>4)A.push(['mid',`仓组间 GMV 环比分化 ${d.toFixed(1)}pct（${cz[0].name} vs ${cz[1].name}）`,'定位弱势仓组，单独复盘招商与履约链路']);}
+  // 7. 类目异常：GMV 环比深跌
+  DATA.cats.forEach(d=>{if(d.gmv.r1<-15)A.push(['high',`三级类目【${d.name}】GMV 环比 ${d.gmv.r1.toFixed(1)}%`,'下钻邻仓/去年同期，定位供价或补贴异常']);});
+  // 8. 异常商家
+  DATA.mch.filter(m=>m.anom).forEach(m=>A.push(['mid',`商家【${m.name}】GMV/SKU 异常下滑`,'核查是否断供、排期异常或竞品冲击']));
+  // 9. 损失毛利占比
+  const lossSum=DATA.loss.reduce((s,d)=>s+d.loss,0);
+  const lossRatio=lossSum/DATA.cur.gmv*100;
+  if(lossRatio>3)A.push(['high',`损失毛利合计 ${lossSum.toFixed(1)} 万（占 GMV ${lossRatio.toFixed(1)}%）`,'优先处理 Top20 高损商品，评估降价/汰换/补货']);
+  else DATA.loss.slice(0,3).forEach(d=>A.push(['low',`商品【${d.name}】损失毛利 ${d.loss} 万`,'纳入常规监控，评估补货/汰换节奏']));
+
+  if(A.length===0){document.getElementById('alerts').innerHTML='<p class="muted">✅ 本双周未触发异常阈值。</p>';return;}
+  const n={high:0,mid:0,low:0};A.forEach(a=>n[a[0]]++);
+  const sum=`<div class="alert-summary">
+    <span class="pill pill-h">高 ${n.high}</span>
+    <span class="pill pill-m">中 ${n.mid}</span>
+    <span class="pill pill-l">低 ${n.low}</span>
+    <span style="color:var(--sub);font-size:12px;align-self:center">共 ${A.length} 条诊断</span></div>`;
+  const cards=A.map(([lv,t,act])=>
+    `<div class="alert ${lv}"><span class="lv lv-${lv}">${lv==='high'?'高':lv==='mid'?'中':'低'}</span>${t}<div class="act">→ 建议：${act}</div></div>`).join('');
+  document.getElementById('alerts').innerHTML=sum+cards;
+}
+function sw(n){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===n-1));
+  document.getElementById('s1').classList.toggle('on',n===1);
+  document.getElementById('s2').classList.toggle('on',n===2);}
+window.addEventListener('load',()=>run());
+</script>
+</body>
+</html>
