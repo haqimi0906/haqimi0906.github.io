@@ -51,6 +51,10 @@
   .about{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px}
   .about ul{margin:12px 0 0 18px;color:var(--sub)}
   .about li{margin:6px 0}
+  .about .ds{margin:10px 0 0 0;padding:0;list-style:none}
+  .about .ds li{position:relative;padding:6px 0 6px 18px;margin:8px 0;font-size:14px;color:var(--ink);line-height:1.65}
+  .about .ds li::before{content:"";position:absolute;left:0;top:12px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .about .ds b{color:var(--accent);font-weight:600}
   .case{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:22px;margin-bottom:16px}
   .case h3{font-size:18px}
   .case .meta{font-size:13px;color:var(--accent);margin:4px 0 12px}
@@ -208,6 +212,13 @@
       <p><b>业务背景</b>：多多买菜是拼多多社区团购业务，采销需在节庆/换季窗口前完成选品、招商、复盘。在此业务线从事运营约 1 年。</p>
       <p><b>核心问题</b>：一线两大痛点——选品依赖经验判断，复盘招商依赖手动操作。</p>
       <p><b>解决方案</b>：设计面向采销的选品提效工具，覆盖诊断、选品、招商、复盘四个环节，从<b>设计、数据、评估</b>三个角度展开。</p>
+      <p style="margin-bottom:0"><b>设计思路</b></p>
+      <ul class="ds">
+        <li><b>定义问题</b>：选品与复盘高度依赖经验与重复手工，效率、稳定性双受限</li>
+        <li><b>拆解</b>：把场景拆为诊断 / 选品 / 招商 / 复盘四环节，逐环节界定「AI 能承担什么、人必须拍板什么」</li>
+        <li><b>方案</b>：单 Agent 串联全周期，RAG + Prompt 保证结果可核对、可控</li>
+        <li><b>采销反馈迭代</b>：初版「AI 出终稿」被反馈「不能改、不能挑、要替 AI 背书」 → 收敛为「Agent 出初稿、采销做终稿」</li>
+      </ul>
     </div>
 
     <div class="case" id="angle1">
@@ -465,6 +476,13 @@
       <p><b>业务背景</b>：盘品会前采销需拉取双周报表（大盘 / 仓组 / 三级类目 / 商家 / 损失毛利）并做异常诊断，流程依赖手工从看板摘数、拼表、圈异常，周期长、重复高。</p>
       <p><b>核心问题</b>：报表拉取与异常识别高度重复，采销投入大量工时在"搬数"而非"判断"。</p>
       <p><b>解决方案</b>：设计面向采销的数据产品——选双周日期 + 选类目包，由 Agent 自动拉取报表并下探至多粒度，输出双周报与异常诊断，直接作为盘品会分析素材。</p>
+      <p style="margin-bottom:0"><b>设计思路</b></p>
+      <ul class="ds">
+        <li><b>定义问题</b>：双周复盘「搬数」占比高，采销工时耗在重复拉表而非判断</li>
+        <li><b>拆解</b>：把复盘拆为「拉数 → 算指标 → 下探定位 → 异常诊断」四步，前两步交给 Agent</li>
+        <li><b>方案</b>：选日期 + 类目包即出双 Sheet 报表，异常才报警</li>
+        <li><b>采销反馈迭代</b>：初版全量输出被反馈「信息过载、找不到重点」 → 收敛为 Sheet2 仅报警异常、阈值可调，采销从「搬数」转为「判断」</li>
+      </ul>
     </div>
     <div class="case">
       <div class="case-head">
@@ -500,7 +518,7 @@
         <h4>复盘与迭代</h4>
         <ul>
           <li>局限：概念设计阶段，报表数据为模拟拉取，未接真实数据源；异常阈值为规则假设。</li>
-          <li>下一步：接入真实看板接口，将异常诊断阈值交由采销可调，沉淀为周期性自动推送。</li>
+          <li>下一步：接入真实看板接口，将异常诊断阈值交由采销可调（呼应一线采销"阈值应我能定"的反馈），沉淀为周期性自动推送。</li>
         </ul>
       </div>
     </div>
@@ -535,24 +553,24 @@
           <td>纯 Agent 推送：Agent 直接给出终稿清单，一并设想了微调、硬实时、C 端个性化</td>
           <td>只点确认，不能改、不能挑</td>
           <td>微调 + 硬实时 + C 端个性化</td>
-          <td>AI 出终稿等于默认每个数字都对，任一处存疑采销就要逐条复核，省下的时间又还回去；且清单最终由采销签字担责，不能改不能挑，等于让采销替 AI 的结论背书</td>
+          <td>一线采销反馈：清单不能改、不能挑，等于要替 AI 的结论背书——任一处存疑就得逐条复核，省下的时间又还回去；签字担责的却是人。</td>
         </tr>
         <tr>
           <td><span class="ver">v2</span></td>
           <td>Agent 退为自定义筛选辅助：拆成两个页面，C 端字段固定，由采销逐项配置</td>
           <td>能改了，但要从零配置，路径变长</td>
           <td>单 Agent + 工具调用</td>
-          <td>解决了"能不能改"，却没解决"改起来累不累"：拆成两个页面、每项都要从零配置，操作路径拉长，采销走不完全程</td>
+          <td>一线采销反馈：能改了，但要从零配置、路径太长，走不完全程——"改起来太累"；拆成两个页面、每项从零配，操作路径被拉长。</td>
         </tr>
         <tr>
           <td><span class="ver">v3</span><span class="ver-now">现版本</span></td>
           <td>Agent 与采销自主性结合：口径与清单由 Agent 预填，采销在结果上修改，人工兜底</td>
           <td>可改、可剔、可加回，终点仍是一键招商</td>
           <td>单 Agent + 工具调用 + 结果带出处 + 异常才提醒</td>
-          <td>收敛出核心判断：轻操作不等于不给操作——不用从零操作，但不能不给操作</td>
+          <td>一线采销真实使用验证：轻操作不等于不给操作——不用从零操作，但不能不给操作；采销在预填结果上直接修改，终点仍是一键招商。</td>
         </tr>
       </table>
-      <p style="color:var(--sub);font-size:13px;margin-top:12px"><b>三次改版沉淀的判断</b>：①自动化的边界由"错了谁承担"决定——结论可以给，执行要人确认；②每次改版都由业务约束触发——准确率能不能兜住、权责对不对得上、操作重不重，而非由技术可能性触发；③比起一版到位的理想方案，被业务约束一步步修正的过程，更能说明产品判断如何形成。</p>
+      <p style="color:var(--sub);font-size:13px;margin-top:12px"><b>三次改版沉淀的判断</b>：①自动化的边界由"错了谁承担"决定——结论可以给，执行要人确认；②每次改版都由一线采销的真实反馈触发——他们反馈"不能改不能挑""改起来累""信息过载"，倒逼方案收敛，而非由技术可能性驱动；③比起一版到位的理想方案，被真实用户反馈一步步修正的过程，更能说明产品判断与概念设计能力如何形成。</p>
     </div>
   </div>
 </section>
