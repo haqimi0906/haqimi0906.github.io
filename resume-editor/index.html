@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>简历生成器</title>
+<link rel="icon" href="assets/icon.png">
+<link rel="stylesheet" href="assets/resume.css">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<!-- 用来把 cm 换算成 px，别删 -->
+<div id="probe"></div>
+
+<div class="app">
+
+  <!-- ====================== 侧栏 ====================== -->
+  <aside class="sidebar">
+    <div class="titlebar">
+      <h1>简历生成器</h1>
+      <!-- 撤销 / 重做。两个互为镜像的回转箭头，是这类控件的通用画法；
+           id 沿用原来「反悔」面板里的那两个，逻辑不用动 -->
+      <div class="histbar" id="histbar" hidden>
+        <button class="hist-btn" id="btn-undo" disabled aria-label="撤销"
+                title="撤销（Ctrl+Z）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4.5 9h9.5a5.5 5.5 0 0 1 0 11h-3.5"/>
+            <polyline points="8.5 4.5 4 9 8.5 13.5"/>
+          </svg>
+        </button>
+        <button class="hist-btn" id="btn-redo" disabled aria-label="重做"
+                title="重做（Ctrl+Shift+Z）">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19.5 9H10a5.5 5.5 0 0 0 0 11h3.5"/>
+            <polyline points="15.5 4.5 20 9 15.5 13.5"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="storage-warn" class="notice warn" hidden>
+      <b>自动保存已停用。</b>内容超出了浏览器的存储配额（多半是证件照太大）。
+      现在关掉页面就会丢，请用下面的「下载改好的 JSON」自己存一份。
+    </div>
+
+    <section class="panel">
+      <h2>开始</h2>
+      <button class="btn primary wide" id="btn-blank">新建空白简历</button>
+      <label class="btn wide" for="file">打开 resume.json</label>
+      <input type="file" id="file" accept=".json,application/json" hidden>
+      <div class="btn-row">
+        <button class="btn" id="btn-paste">粘贴 JSON</button>
+        <button class="btn" id="btn-sample">看示例</button>
+        </div>
+        <div class="btn-row">
+        <button class="btn" id="btn-tour">新手指引</button>
+      </div>
+    </section>
+
+    <div id="editor-tools" hidden>
+
+      <section class="panel">
+        <h2>添加板块</h2>
+        <label class="row">
+          <span>选一个</span>
+          <select id="new-sec">
+            <optgroup label="经历类">
+              <option value="intern">实习经历</option>
+              <option value="work">工作经历</option>
+              <option value="project">项目经历</option>
+              <option value="research">科研经历</option>
+              <option value="contest">竞赛经历</option>
+              <option value="paper">论文专利</option>
+            </optgroup>
+            <optgroup label="清单类">
+              <option value="skills">个人技能</option>
+              <option value="cert">证书</option>
+              <option value="lang">语言能力</option>
+              <option value="award">荣誉奖项</option>
+              <option value="portfolio">作品集</option>
+              <option value="summary">自我总结</option>
+            </optgroup>
+            <optgroup label="其它">
+              <option value="edu">教育经历</option>
+              <option value="campus">校园经历</option>
+              <option value="custom">自定义标题…</option>
+            </optgroup>
+          </select>
+        </label>
+        <button class="btn wide" id="btn-add-sec">添加到简历</button>
+        <p class="hint">新板块会插在「自我总结」前面。想换位置，拖板块标题右边的 <b>⠿</b>。<br>
+           每个板块标题<b>右边就有「＋」</b>，点它往这个板块里加东西。</p>
+      </section>
+
+      <section class="panel">
+        <h2>文字</h2>
+        <div class="btn-row">
+          <button class="btn" id="btn-bold" disabled><b>B</b>&nbsp;&nbsp;加粗</button>
+        </div>
+        <p class="hint">在纸上划选一段字，点这里或按 <kbd>Ctrl</kbd>+<kbd>B</kbd>，再来一次取消。<br>
+           用来把一条长要点里的关键数字挑出来。</p>
+      </section>
+
+      <section class="panel" id="panel-layout">
+        <h2>版面松紧</h2>
+        <label class="row">
+          <span>预设档位</span>
+          <select id="ladder">
+            <option value="-1">自定义</option>
+            <option value="0">13.5pt 最松</option>
+            <option value="1">12.75pt</option>
+            <option value="2">12pt</option>
+            <option value="3">11.5pt</option>
+            <option value="4">11pt</option>
+            <option value="5">10.5pt</option>
+            <option value="6">10pt</option>
+            <option value="7">9.5pt</option>
+            <option value="8">9pt</option>
+            <option value="9">8.5pt 最紧</option>
+          </select>
+        </label>
+
+        <label class="row slider"><span>字号</span>
+          <input type="range" id="sl-base" min="8" max="15" step="0.25"><b id="val-base"></b></label>
+        <label class="row slider"><span>行距</span>
+          <input type="range" id="sl-leading" min="0.9" max="1.4" step="0.01"><b id="val-leading"></b></label>
+        <label class="row slider"><span>要点间距</span>
+          <input type="range" id="sl-item" min="0" max="8" step="0.1"><b id="val-item"></b></label>
+        <label class="row slider"><span>条目间距</span>
+          <input type="range" id="sl-entry" min="0" max="14" step="0.5"><b id="val-entry"></b></label>
+        <label class="row slider"><span>板块间距</span>
+          <input type="range" id="sl-secAbove" min="0" max="14" step="0.5"><b id="val-secAbove"></b></label>
+        <label class="row slider"><span>标题到横线</span>
+          <input type="range" id="sl-titleGap" min="0" max="8" step="0.5"><b id="val-titleGap"></b></label>
+        <label class="row slider"><span>横线到正文</span>
+          <input type="range" id="sl-secBelow" min="0" max="10" step="0.5"><b id="val-secBelow"></b></label>
+        <label class="row slider"><span>照片宽度</span>
+          <input type="range" id="sl-photo" min="2" max="4" step="0.05"><b id="val-photo"></b></label>
+        <label class="row slider"><span>页顶留白</span>
+          <input type="range" id="sl-padT" min="0.3" max="2.5" step="0.05"><b id="val-padT"></b></label>
+        <label class="row slider"><span>页底留白</span>
+          <input type="range" id="sl-padB" min="0.3" max="2.5" step="0.05"><b id="val-padB"></b></label>
+        <!-- 上下留白一旦超过 0.8cm，浏览器打印时会自己往页边距里塞日期和网址
+             （原因见 app.js 里 HF_GUIDE 那段注释）。提示必须贴在这两根滑块正下方 ——
+             用户根本不会把「我调了留白」和「纸上多了页眉」联系起来。 -->
+        <p class="warn-inline" id="hf-warn" hidden>
+          <b id="hf-warn-where">页顶</b>留白超过 0.8cm 后，浏览器打印时会自己在这里加上
+          <b>日期和网址</b>。打印对话框里「更多设置」→ 取消勾选「页眉和页脚」即可。
+          <button class="btn tiny" id="btn-hf-fix">调回 0.8</button>
+        </p>
+        <label class="row slider"><span>左右留白</span>
+          <input type="range" id="sl-padX" min="0.3" max="3" step="0.05"><b id="val-padX"></b></label>
+      </section>
+
+      <section class="panel">
+        <h2>主题色</h2>
+        <div id="swatches" class="swatches"></div>
+        <label class="row"><span>自己选一个</span>
+          <input type="color" id="theme-custom" value="#1c5ab4"></label>
+        <p class="hint">标签、横线、图标、链接会一起跟着换。深色系印出来更稳，越浅的颜色越容易在黑白打印机上糊掉。</p>
+      </section>
+
+      <section class="panel">
+        <h2>版面占用</h2>
+        <div id="fill">
+          <div class="fill-track"><div id="fill-bar"></div></div>
+          <div id="fill-text">—</div>
+        </div>
+        <p class="hint" id="fill-hint"></p>
+        <label class="row">
+          <span>目标页数</span>
+          <select id="target-pages">
+            <option value="1">1 页（校招常规）</option>
+            <option value="2">2 页</option>
+            <option value="3">3 页</option>
+            <option value="0">不限</option>
+          </select>
+        </label>
+        <p class="hint">超过目标页数才会报红。内容多了会自动排到下一张纸上，
+           跨页的整段经历会被整块推到下一页，不会被切成两半。</p>
+      </section>
+
+      <section class="panel" id="panel-photo">
+        <h2>照片</h2>
+        <div class="btn-row">
+          <label class="btn" for="photo-file">换一张</label>
+          <input type="file" id="photo-file" accept="image/*" hidden>
+          <button class="btn" id="btn-photo-del">不要照片</button>
+        </div>
+        <p class="hint">会自动缩到 420px 宽，不用先自己压缩。</p>
+      </section>
+
+      <section class="panel">
+        <h2>反悔</h2>
+        <button class="btn wide" id="btn-revert">还原全部</button>
+        <p class="hint">撤销 / 重做在<b>标题右边那两个箭头</b>上，快捷键
+           <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd>。
+           在某个字段里打字时，<kbd>Ctrl</kbd>+<kbd>Z</kbd> 走浏览器自己的逐字撤销。
+           「还原全部」直接回到刚导入时。</p>
+      </section>
+
+      <section class="panel" id="panel-export">
+        <h2>导出</h2>
+        <button class="btn primary wide" id="btn-print">打印 / 存成 PDF</button>
+        <button class="btn wide" id="btn-json">下载改好的 JSON</button>
+        <p class="hint">快捷键 <kbd>Ctrl</kbd>+<kbd>P</kbd> / <kbd>Ctrl</kbd>+<kbd>S</kbd>。
+           下载的 JSON 连版面参数和主题色一起带走，下次打开原样恢复。</p>
+      </section>
+
+      <section class="panel">
+        <h2>显示比例</h2>
+        <label class="row slider"><span>缩放</span>
+          <input type="range" id="zoom" min="40" max="120" step="5"><b id="zoom-val"></b></label>
+        <button class="btn wide" id="btn-zoom-fit">适应窗口</button>
+        <p class="hint">只影响屏幕上看着大小，不影响打印。</p>
+      </section>
+
+    </div>
+  </aside>
+
+  <!-- ====================== 主区 ====================== -->
+  <div id="empty" class="empty">
+    <div class="empty-inner">
+      <div class="empty-icon">📄</div>
+      <h2>从「新建空白简历」开始</h2>
+      <p>已经有 <code>resume.json</code> 的话，把它拖到这里就行。<br>
+         想先看看长什么样，点左边的「看示例」。</p>
+    </div>
+  </div>
+
+  <main id="stage" class="stage" hidden>
+    <div class="paper">
+      <div id="sheets"></div>   <!-- 一页一张纸，垫在内容底下，不参与排版 -->
+      <div id="doc"></div>
+    </div>
+  </main>
+
+</div>
+
+<!-- ====================== 板块图标选择器 ====================== -->
+<div id="icon-pick" hidden></div>
+
+<!-- ====================== 打印提示 ====================== -->
+<dialog id="print-tips">
+  <h2>打印前，请在打印对话框里确认</h2>
+  <ol>
+    <li id="tip-hf" hidden><b>页眉和页脚：关掉。</b>不关的话纸上会印出网址和日期。
+        <span id="tip-hf-why" hidden>你把 <b id="tip-hf-val"></b> 调大了，所以这次<b>一定</b>会出现。</span><br>
+        （Chrome / Edge：展开「更多设置」→ 取消勾选「页眉和页脚」）</li>
+    <li id="tip-bg"><b>背景图形：勾上。</b>不勾的话彩色横线和图标会全部消失。</li>
+    <li id="tip-paper"><b>纸张 A4、边距选「默认」。</b>页边距已经写在网页里了，不用自己调。</li>
+  </ol>
+  <p class="hint">目标是「另存为 PDF」。如果版面和预览不一样，回来检查上面几项。</p>
+  <label class="checkline"><input type="checkbox" id="skip-tips"> 记住设置，以后别再提示我</label>
+  <div class="btn-row end">
+    <button class="btn" id="btn-print-cancel">取消</button>
+    <button class="btn primary" id="btn-print-go">好，去打印</button>
+  </div>
+</dialog>
+
+<script src="assets/photo.js"></script>
+<script src="assets/sample.js"></script>
+<script src="assets/render.js"></script>
+<script src="assets/tour.js"></script>
+<script src="assets/app.js"></script>
+<!-- Cloudflare Web Analytics —— 只统计访问量，无 Cookie、不做用户画像，
+     也碰不到简历内容（简历全程只在本机的内存和 localStorage 里）。
+     自己 fork 部署的话，把这一段删掉，或者换成你自己的 token。 -->
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0a7872bcab8843e9aceebad20a0dc404"}'></script>
+<!-- End Cloudflare Web Analytics -->
+</body>
+</html>
