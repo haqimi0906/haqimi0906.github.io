@@ -16,16 +16,16 @@
 
 /* ---- 版面档位：从最松到最紧，对应 resume.css 里那几个变量 ---- */
 const LADDER = [
-  { base: 13.5,  leading: 1.14, secAbove: 9,   titleGap: 3.5, secBelow: 5,   item: 3.5, entry: 7.5, photo: 3.05, padT: 0.8, padB: 0.8, padX: 1.0 },
-  { base: 12.75, leading: 1.11, secAbove: 8,   titleGap: 3,   secBelow: 4.5, item: 3,   entry: 6.8, photo: 2.95, padT: 0.8, padB: 0.8, padX: 1.0 },
-  { base: 12,    leading: 1.08, secAbove: 7,   titleGap: 3,   secBelow: 4,   item: 2.5, entry: 6,   photo: 2.85, padT: 0.8, padB: 0.8, padX: 1.0 },
-  { base: 11.5,  leading: 1.06, secAbove: 6,   titleGap: 3,   secBelow: 3.5, item: 2,   entry: 5.5, photo: 2.85, padT: 0.8, padB: 0.8, padX: 1.0 },
-  { base: 11,    leading: 1.04, secAbove: 5.5, titleGap: 3,   secBelow: 3,   item: 2,   entry: 5,   photo: 2.85, padT: 0.8, padB: 0.8, padX: 1.0 },
-  { base: 10.5,  leading: 1.02, secAbove: 5,   titleGap: 3,   secBelow: 3,   item: 1.8, entry: 4.8, photo: 2.85, padT: 0.8, padB: 0.8, padX: 1.0 },
-  { base: 10,    leading: 1.00, secAbove: 5,   titleGap: 3,   secBelow: 3,   item: 1.5, entry: 4.5, photo: 2.85, padT: 0.8, padB: 0.8, padX: 1.0 },
-  { base: 9.5,   leading: 0.99, secAbove: 4.5, titleGap: 2.5, secBelow: 2.5, item: 1.2, entry: 4,   photo: 2.75, padT: 0.8, padB: 0.8, padX: 1.0 },
-  { base: 9,     leading: 0.98, secAbove: 4,   titleGap: 2.5, secBelow: 2.5, item: 1,   entry: 3.5, photo: 2.6, padT: 0.8, padB: 0.8, padX: 1.0 },
-  { base: 8.5,   leading: 0.97, secAbove: 3.5, titleGap: 2,   secBelow: 2,   item: 0.8, entry: 3,   photo: 2.5, padT: 0.8, padB: 0.8, padX: 1.0 },
+  { base: 13.5,  leading: 1.14, secAbove: 9,   titleGap: 3.5, secBelow: 5,   item: 3.5, entry: 7.5, entryBody: 5,   photo: 3.05, padT: 0.8, padB: 0.8, padX: 1.0 },
+  { base: 12.75, leading: 1.11, secAbove: 8,   titleGap: 3,   secBelow: 4.5, item: 3,   entry: 6.8, entryBody: 4.5, photo: 2.95, padT: 0.8, padB: 0.8, padX: 1.0 },
+  { base: 12,    leading: 1.08, secAbove: 7,   titleGap: 3,   secBelow: 4,   item: 2.5, entry: 6,   entryBody: 4,   photo: 2.85, padT: 0.8, padB: 0.8, padX: 1.0 },
+  { base: 11.5,  leading: 1.06, secAbove: 6,   titleGap: 3,   secBelow: 3.5, item: 2,   entry: 5.5, entryBody: 3.5, photo: 2.85, padT: 0.8, padB: 0.8, padX: 1.0 },
+  { base: 11,    leading: 1.04, secAbove: 5.5, titleGap: 3,   secBelow: 3,   item: 2,   entry: 5,   entryBody: 3.2, photo: 2.85, padT: 0.8, padB: 0.8, padX: 1.0 },
+  { base: 10.5,  leading: 1.02, secAbove: 5,   titleGap: 3,   secBelow: 3,   item: 1.8, entry: 4.8, entryBody: 3,   photo: 2.85, padT: 0.8, padB: 0.8, padX: 1.0 },
+  { base: 10,    leading: 1.00, secAbove: 5,   titleGap: 3,   secBelow: 3,   item: 1.5, entry: 4.5, entryBody: 2.8, photo: 2.85, padT: 0.8, padB: 0.8, padX: 1.0 },
+  { base: 9.5,   leading: 0.99, secAbove: 4.5, titleGap: 2.5, secBelow: 2.5, item: 1.2, entry: 4,   entryBody: 2.5, photo: 2.75, padT: 0.8, padB: 0.8, padX: 1.0 },
+  { base: 9,     leading: 0.98, secAbove: 4,   titleGap: 2.5, secBelow: 2.5, item: 1,   entry: 3.5, entryBody: 2.2, photo: 2.6, padT: 0.8, padB: 0.8, padX: 1.0 },
+  { base: 8.5,   leading: 0.97, secAbove: 3.5, titleGap: 2,   secBelow: 2,   item: 0.8, entry: 3,   entryBody: 2,   photo: 2.5, padT: 0.8, padB: 0.8, padX: 1.0 },
 ];
 
 const VARMAP = {  // 滑块 id -> [CSS 变量, 单位]
@@ -36,6 +36,7 @@ const VARMAP = {  // 滑块 id -> [CSS 变量, 单位]
   secBelow: ["--sec-gap-below", "pt"],
   item:     ["--item-gap", "pt"],
   entry:    ["--entry-gap", "pt"],
+  entryBody:["--entry-body-gap", "pt"],
   photo:    ["--photo-w", "cm"],
   padT:     ["--page-mt", "cm"],
   padB:     ["--page-mb", "cm"],
@@ -136,6 +137,7 @@ const LS_VARS  = "resume-editor:vars";
 const LS_THEME = "resume-editor:theme";
 const LS_TIPS  = "resume-editor:skiptips";
 const LS_PAGES = "resume-editor:pages";
+const LS_BULLET = "resume-editor:bullet";   // 分点标记：圆点 / 数字
 
 /* ---- 打印时那个「自己冒出来的页眉页脚」 ----
    Chromium（Chrome / Edge 同核）把页眉页脚画在 @page 的上下 margin 里，而且
@@ -176,6 +178,7 @@ const state = {
   storageFull: false,
   transient: false,  // 开场示例：还没被动过，先不占本地存档（见启动那段）
   unsaved: false,    // 改过，且改完之后没导出过 JSON。关页面前拿它决定要不要拦一下
+  bulletNum: false,  // 分点标记：false=· 圆点，true=1.2.3 数字
 };
 
 const $  = (s) => document.querySelector(s);
@@ -515,6 +518,9 @@ function syncMeta() {
 
   if (state.targetPages === 1) delete state.data.meta.target_pages;   // 1 页是默认，不写
   else state.data.meta.target_pages = state.targetPages;
+
+  if (state.bulletNum) state.data.meta.bulletNum = true;   // false 是默认，不写
+  else delete state.data.meta.bulletNum;
 }
 
 /* ============================== 页数与填充率 ============================== */
@@ -673,6 +679,7 @@ function persist() {
     localStorage.setItem(LS_VARS, JSON.stringify(state.vars));
     localStorage.setItem(LS_THEME, JSON.stringify(state.theme));
     localStorage.setItem(LS_PAGES, String(state.targetPages));
+    localStorage.setItem(LS_BULLET, String(!!state.bulletNum));
     if (state.storageFull) { state.storageFull = false; $("#storage-warn").hidden = true; }
   } catch (e) {
     // 多半是照片太大撑爆了配额。以前这里是静默吞掉的，
@@ -705,6 +712,16 @@ function applyMetaLayout(m) {
   state.targetPages = [0, 1, 2, 3].includes(m.target_pages) ? m.target_pages : 1;
   const sel = $("#target-pages");
   if (sel) sel.value = String(state.targetPages);
+  state.bulletNum = !!m.bulletNum;
+  applyBulletMark();
+}
+
+/** 分点标记：圆点 · 还是数字 1.2.3。#doc 切 class，按钮文案同步 */
+function applyBulletMark() {
+  const doc = $("#doc");
+  if (doc) doc.classList.toggle("bullet-num", !!state.bulletNum);
+  const btn = $("#btn-bullet-mark");
+  if (btn) btn.textContent = state.bulletNum ? "分点标记：1.2.3 数字" : "分点标记：· 圆点";
 }
 
 /** 照片的三态：字符串 = 用这张；空字符串 = 明确不要；null / 没这个字段 = 没设置过。
@@ -1176,6 +1193,11 @@ function bind() {
   // 焦点留在原地，execCommand 作用的还是刚才划选的那一段。
   $("#btn-bold").addEventListener("mousedown", (e) => e.preventDefault());
   $("#btn-bold").addEventListener("click", applyBold);
+  $("#btn-bullet-mark").addEventListener("click", () => {
+    state.bulletNum = !state.bulletNum;
+    applyBulletMark();
+    syncMeta(); persist();
+  });
 
   // ---- 导出 ----
   $("#btn-json").addEventListener("click", downloadJson);
@@ -1346,20 +1368,16 @@ window.addEventListener("DOMContentLoaded", () => {
         $("#target-pages").value = tp;
         syncMeta(); measure();
       }
+      const bm = localStorage.getItem(LS_BULLET);
+      if (bm !== null) { state.bulletNum = bm === "true"; applyBulletMark(); }
     }
   } catch (e) { /* 存档坏了就当没有 */ restored = false; }
   // 纸上有东西了才谈得上指引；跑没跑过由 tour.js 自己记
   setTimeout(() => { if (state.data) window.maybeStartTour?.(); }, 0);
 
-  // 第一次来的人：直接摆一份填满一页的示例在纸上。空白页看不出这个工具能做什么，
-  // 改现成的比从零填快得多。只此一次 —— 记下「来过」，以后不再摆；
-  // 用户真动了内容，示例就转正成他自己的存档（见 markDirty / persist）。
+  // 没有本地存档时，每次都直接摆一份填满的示例（你的简历）在纸上；
+  // 用户改过并刷新则由上面的 restore 优先恢复他自己的存档。
   if (!restored && window.SAMPLE) {
-    let seen = true;
-    try { seen = localStorage.getItem(LS_SEEN) === "1"; } catch (e) { seen = false; }
-    if (!seen) {
-      loadData(clone(window.SAMPLE), { transient: true });
-      try { localStorage.setItem(LS_SEEN, "1"); } catch (e) { /* 存不下就算了 */ }
-    }
+    loadData(clone(window.SAMPLE), { transient: true });
   }
 });

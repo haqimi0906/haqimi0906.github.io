@@ -13,6 +13,7 @@
   --sec-gap-below:  3.5pt;    /* 横线到正文 */
   --item-gap:       2pt;      /* 要点之间 */
   --entry-gap:      5.5pt;    /* 条目之间 */
+  --entry-body-gap: 2pt;      /* 条目标题到首条要点 */
   --idline-gap:     3pt;      /* 信息区的行与行 */
   --photo-w:        2.85cm;   /* 照片宽度 */
   --page-mt:        0.8cm;    /* 页顶留白 */
@@ -124,6 +125,10 @@
 .bullet .sq{ display:inline-block; width:0.30em; height:0.30em;
              background:var(--accent); vertical-align:0.16em; margin-right:0.42em; }
 .bullet .lab{ color:var(--accent-dark); font-weight:700; }
+/* 条目标题到首条要点的距离，单独可调（与「要点之间」分开）。
+   用「前面没有 .bullet 兄弟」来锁定第一个要点，避开 :first-of-type 按 div 标签
+   误判（.entry 下第一个 div 是 .entry-head，会让 :first-of-type 永远落空）。 */
+.entry .bullet:not(.bullet ~ .bullet){ margin-top:var(--entry-body-gap); }
 
 /* ---------- 技能行 / 备注行 ---------- */
 .skill{ display:flex; align-items:baseline; margin-top:1pt; }
@@ -131,6 +136,15 @@
 .skill .val{ flex:1 1 auto; min-width:0; text-align:justify; }
 .note{ margin-top:1pt; }
 .note .lab{ font-weight:700; }
+
+/* 分点标记：默认小方块（·）可一键切换成 1. 2. 3. 数字。
+   数字按「每段经历」重新从 1 开始编号；打印时计数器照常生效。 */
+#doc.bullet-num .entry{ counter-reset:bnum; }
+#doc.bullet-num .bullet{ counter-increment:bnum;
+  padding-left:1.6em; text-indent:-1.6em; }
+#doc.bullet-num .bullet .sq{ display:none; }
+#doc.bullet-num .bullet::before{
+  content:counter(bnum) ". "; color:var(--accent-dark); font-weight:700; }
 
 /* ============================================================
    打印：纸张的屏幕修饰全部去掉，交给 @page 控制真实页边距
