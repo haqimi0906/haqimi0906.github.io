@@ -54,9 +54,9 @@
     background:var(--card);border-radius:9px;color:var(--text-2);cursor:pointer;
     display:flex;align-items:center;justify-content:center;transition:.2s;}
   .iconbtn:hover{color:var(--gold);border-color:var(--gold);transform:translateY(-1px);}
-  .navcta{display:inline-flex;align-items:center;gap:5px;margin-left:10px;font-size:12.8px;
+  .navcta{display:inline-flex;align-items:center;gap:5px;margin-left:10px;font-size:13.4px;
     font-weight:700;color:#241c0e;text-decoration:none;border:1px solid var(--gold);
-    background:var(--gold);border-radius:20px;padding:6px 15px;transition:.2s;white-space:nowrap;
+    background:var(--gold);border-radius:20px;padding:7px 17px;transition:.2s;white-space:nowrap;
     box-shadow:0 4px 14px rgba(200,150,42,.35);animation:ctapulse 2.4s ease-in-out infinite;}
   .navcta:hover{transform:translateY(-1px);box-shadow:0 6px 26px 6px rgba(200,150,42,.6);animation:none;}
   @keyframes ctapulse{0%,100%{box-shadow:0 4px 14px rgba(200,150,42,.35);}
@@ -67,7 +67,12 @@
   /* ---------- 布局 ---------- */
   .wrap{max-width:1120px;margin:0 auto;padding:0 30px 90px;
     display:grid;grid-template-columns:304px 1fr;gap:56px;align-items:start;}
-  .side{position:sticky;top:64px;padding:42px 0 20px;min-width:0;}
+  .side{position:sticky;top:64px;padding:42px 0 20px;min-width:0;
+    max-height:calc(100vh - 64px);overflow-y:auto;overscroll-behavior:contain;
+    scrollbar-width:thin;scrollbar-color:var(--gold-line) transparent;}
+  .side::-webkit-scrollbar{width:6px;}
+  .side::-webkit-scrollbar-thumb{background:var(--gold-line);border-radius:6px;}
+  .side::-webkit-scrollbar-track{background:transparent;}
   .main{padding:42px 0 0;min-width:0;}
 
   /* ---------- 左栏 ---------- */
@@ -98,6 +103,18 @@
   .ctc:hover{background:var(--gold-soft);color:var(--gold);}
   .ctc:hover .ctc-hint{opacity:1;transform:none;color:var(--gold);}
   .ctc:focus-visible{outline:2px solid var(--gold);outline-offset:-2px;}
+  /* 左栏「作品集」——常驻高亮，不做 hover 才现 */
+  .ctc-web{background:linear-gradient(135deg,var(--gold),var(--gold-2));
+    border:1px solid var(--gold);border-bottom:1px solid var(--gold);
+    border-radius:11px;padding:11px 13px;margin-top:11px;align-items:center;
+    color:#241c0e;font-weight:700;box-shadow:0 5px 16px rgba(200,150,42,.32);
+    animation:ctapulse 2.4s ease-in-out infinite;}
+  .ctc-web .ctc-l{color:#241c0e;opacity:.78;}
+  .ctc-web .ctc-v{color:#241c0e;font-weight:700;}
+  .ctc-web .ctc-hint{opacity:1;transform:none;color:#241c0e;font-weight:700;}
+  .ctc-web:hover{background:linear-gradient(135deg,var(--gold-2),var(--gold));
+    color:#241c0e;transform:translateY(-2px);box-shadow:0 9px 26px rgba(200,150,42,.5);animation:none;}
+  .ctc-web:hover .ctc-l,.ctc-web:hover .ctc-v,.ctc-web:hover .ctc-hint{color:#241c0e;}
   .soft{background:var(--bg-soft);border-radius:14px;padding:17px 19px 15px;margin-top:16px;
     transition:background .3s ease;}
   .soft-t{font-family:var(--serif);font-size:14.5px;font-weight:700;color:var(--text);
@@ -132,6 +149,24 @@
   .stat b{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--gold);
     display:block;line-height:1.15;font-variant-numeric:tabular-nums;}
   .stat span{font-size:11.8px;color:var(--text-3);display:block;margin-top:4px;letter-spacing:.2px;}
+  /* 首屏作品集引导条 */
+  .pf-cta{display:flex;align-items:center;justify-content:space-between;gap:18px;
+    margin:16px 0 2px;padding:16px 20px;border-radius:15px;
+    border:1px solid var(--gold-line);
+    background:linear-gradient(135deg,var(--gold-soft),transparent 88%);
+    transition:border-color .25s,box-shadow .25s;}
+  .pf-cta:hover{border-color:var(--gold);box-shadow:0 8px 26px rgba(200,150,42,.16);}
+  .pf-txt{display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .pf-txt b{font-family:var(--serif);font-size:15.5px;color:var(--text);letter-spacing:.2px;}
+  .pf-txt b::before{content:"◆";color:var(--gold);font-size:10.5px;margin-right:7px;vertical-align:1px;}
+  .pf-txt span{font-size:12.4px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;}
+  .pf-btn{display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;
+    background:linear-gradient(135deg,var(--gold),var(--gold-2));color:#241c0e;
+    font-weight:700;font-size:13.4px;text-decoration:none;letter-spacing:.2px;
+    padding:11px 22px;border-radius:24px;white-space:nowrap;
+    box-shadow:0 6px 20px rgba(200,150,42,.38);transition:.2s;
+    animation:ctapulse 2.4s ease-in-out infinite;}
+  .pf-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(200,150,42,.6);animation:none;}
 
   /* 经历 */
   .org{margin-bottom:14px;}
@@ -169,13 +204,20 @@
   .case-body.open{grid-template-rows:1fr;}
   .case-body>.inner{overflow:hidden;min-height:0;}
   .case-body .card ul{margin-top:2px;}
+  /* 工作经历内嵌套的「深度展开」案例 */
+  .case-nest{margin:12px 0 2px;padding-left:18px;border-left:2px solid var(--gold-line);}
+  .case-nest-h{font-size:12px;color:var(--text-3);letter-spacing:.3px;margin-bottom:11px;}
+  .case-cap{font-size:11.4px;color:var(--text-3);letter-spacing:.5px;margin-bottom:5px;font-weight:600;}
+  .case-nest .card{background:var(--bg-soft);}
   .tip{font-size:12.4px;color:var(--text-2);background:var(--gold-soft);
     border:1px solid var(--gold-line);border-radius:12px;padding:12px 16px;
     line-height:1.75;margin-bottom:20px;}
-  .golink{display:inline-flex;align-items:center;gap:7px;font-size:12.6px;font-weight:600;
-    color:var(--gold);text-decoration:none;border:1px solid var(--gold-line);
-    border-radius:20px;padding:5px 14px;margin:2px 0 12px;transition:.2s;}
-  .golink:hover{background:var(--gold-soft);transform:translateX(2px);}
+  .golink{display:inline-flex;align-items:center;gap:6px;font-size:12.8px;font-weight:700;
+    color:#241c0e;text-decoration:none;border:1px solid var(--gold);
+    background:linear-gradient(135deg,var(--gold),var(--gold-2));
+    border-radius:20px;padding:7px 15px;margin:3px 0 13px;
+    box-shadow:0 4px 14px rgba(200,150,42,.32);animation:ctapulse 2.4s ease-in-out infinite;transition:.2s;}
+  .golink:hover{transform:translateY(-1px);box-shadow:0 7px 22px rgba(200,150,42,.55);animation:none;}
   .more{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;}
   .more .card{margin-bottom:0;}
   .more .card-t{font-size:13px;margin-bottom:8px;}
@@ -199,12 +241,15 @@
 
   @media(max-width:900px){
     .wrap{grid-template-columns:minmax(0,1fr);gap:8px;padding:0 22px 70px;}
-    .side{position:static;padding:30px 0 6px;}
+    .side{position:static;padding:30px 0 6px;max-height:none;overflow:visible;}
     .main{padding-top:22px;}
     .nav-in{padding:0 22px;height:58px;}
     .nav-links a{padding:6px 9px;font-size:12.6px;}
     .nav-name{font-size:19px;}
     .stats,.more{grid-template-columns:1fr;}
+    .pf-cta{flex-direction:column;align-items:stretch;gap:12px;}
+    .pf-txt{align-items:center;text-align:center;}
+    .pf-btn{justify-content:center;}
     .side-top{max-width:360px;margin:0 auto;}
     .ctcs{max-width:360px;margin-left:auto;margin-right:auto;}
   }
@@ -216,7 +261,7 @@
     .rv{opacity:1!important;transform:none!important;}
     html.js .sec .sec-h::after{width:54px;}
     .card,.stat,.ava,.ctc{transition:none;}
-    .navcta{animation:none;}
+    .navcta,.ctc-web,.pf-btn,.golink{animation:none;}
   }
   @media(prefers-reduced-motion:reduce){
     .case-body{transition:none;}
@@ -225,7 +270,7 @@
     body{background:#fff;}
     .nav,.totop,.toast{display:none!important;}
     .wrap{display:block;max-width:100%;padding:0;}
-    .side{position:static;padding:0 0 18px;}
+    .side{position:static;padding:0 0 18px;max-height:none;overflow:visible;}
     .rv{opacity:1!important;transform:none!important;}
     .card,.stat{break-inside:avoid;}
     @page{margin:12mm;}
@@ -240,10 +285,9 @@
     <nav class="nav-links">
       <a href="#about" class="on">概述</a>
       <a href="#exp">工作经历</a>
-      <a href="#cases">案例</a>
       <a href="#proj">项目经历</a>
       <a href="#more" data-collapse>其他</a>
-      <a class="navcta" href="https://haqimi0906.github.io/" target="_blank" rel="noopener" title="AI 产品经理作品集">作品集 ↗</a>
+      <a class="navcta" href="https://haqimi0906.github.io/" target="_blank" rel="noopener" title="AI 产品经理作品集">查看作品集 ↗</a>
       <button class="iconbtn" id="themeBtn" title="切换深色 / 浅色" aria-label="切换主题"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
     </nav>
   </div>
@@ -260,7 +304,7 @@
 <div class="ctcs">
 <a class="ctc" href="tel:18403300517" title="点击拨打 18403300517"><span class="ctc-l">电话</span><span class="ctc-v">18403300517</span><span class="ctc-hint">拨打</span></a>
 <button class="ctc" type="button" data-copy="wangjingyu0517@163.com" title="点击复制邮箱"><span class="ctc-l">邮箱</span><span class="ctc-v">wangjingyu0517@163.com</span><span class="ctc-hint">点击复制</span></button>
-<a class="ctc" href="https://haqimi0906.github.io/" target="_blank" rel="noopener" title="AI 产品经理作品集"><span class="ctc-l">作品集</span><span class="ctc-v">haqimi0906.github.io</span><span class="ctc-hint">↗</span></a>
+<a class="ctc ctc-web" href="https://haqimi0906.github.io/" target="_blank" rel="noopener" title="AI 产品经理作品集"><span class="ctc-l">作品集</span><span class="ctc-v">haqimi0906.github.io</span><span class="ctc-hint">查看 ↗</span></a>
 </div></div>
 <div class="soft"><div class="soft-t">教育背景</div>
 <div class="edu"><div class="h">格拉斯哥大学</div><div class="s">管理学硕士（QS 前 100）</div><div class="d">2023-09 – 2025-04</div></div>
@@ -298,7 +342,9 @@
 <div class="stat"><b data-n="28" data-suf="w">28w</b><span>合计日均 GMV 增量</span></div>
 <div class="stat"><b data-n="2886" data-suf="">2886</b><span>SKU 规格核验</span></div>
 <div class="stat"><b data-n="99" data-suf="%">99%</b><span>爆品排期达成率</span></div>
-</div></section>
+</div>
+<div class="pf-cta rv"><div class="pf-txt"><b>完整作品集</b><span>选品 Agent 等 AI 产品 case 的完整过程与设计思路</span></div><a class="pf-btn" href="https://haqimi0906.github.io/" target="_blank" rel="noopener" title="AI 产品经理作品集">查看作品集 ↗</a></div>
+</section>
 <section class="sec" id="exp"><div class="sec-h">工作经历</div>
 <div class="org">
 <div class="org-h"><h3>拼多多 · 多多买菜</h3><span class="d">2025-06 – 至今</span></div>
@@ -309,6 +355,11 @@
 <li>机会新品：搭建招商选品量化体系，经 3 轮迭代收敛考核口径（招商数量 → 排期达成率 → 双口径达标值），以指标驱动招商动作改变，带动 <span class="m">日均 19w GMV 增量</span></li><li>机会新类目：用邻仓与同期数据定位供需缺口、量化收益空间，经两轮机制迭代确定机会类目，落地日维度看板与月度复盘，以数据反馈驱动选品决策，带动考核类目 <span class="m">日均 9 万 GMV 增量</span></li><li>新品目标会：主导周度选品复盘会机制，周均产出机会新品清单 <span class="m">100 个/周</span>、上新率 ~26%、爆品率 9%，形成「发起-跟进-闭环」的数据驱动复盘</li>
 </ul>
 <div class="pills"><span class="pill">招商选品量化</span><span class="pill">机制迭代</span><span class="pill">日均 19w 增量</span><span class="pill">日均 9 万 增量</span><span class="pill">周 100 新品</span></div>
+</div>
+<div class="case-nest rv">
+<div class="case-nest-h">↓ 深度展开 · 以下为「机会品 / 机会三级类目」的真实机制迭代</div>
+<div class="card rv"><div class="case-cap">机会新品识别机制</div><div class="card-t">从 0 设计招商招品机制：用 3 轮迭代把「招好新品」做成可量化、可规模化的产品<span class="tag">↳ 机会新品</span></div><div class="pills"><span class="pill">招商招品机制</span><span class="pill">3 轮迭代</span><span class="pill">日均 19w 增量</span><span class="pill">周 100 新品</span></div><button class="case-toggle on" type="button" aria-expanded="true"><span class="ct-chev">▾</span><span class="ct-lab">收起机制迭代</span></button><div class="case-body open"><div class="inner"><ul><li><span class="m">问题</span>：好新品靠采销个人经验，卖场无法驱动、增量难归因——根因是「机会」没被定义成可分配、可追踪的任务</li><li><span class="m">第 1 轮 · 假设数量驱动</span>：按同期 / 邻仓 / 外源三视角生成招品清单，采销按类目难度计分纳入绩效。上线后发现采销配合度低——招品方向由卖场定，与采销自身节奏冲突</li><li><span class="m">第 2 轮 · 假设质量（排期）驱动</span>：把选择权交还采销——限定品牌 / 品质 / 品相角度，采销自选 SPU、卖场核查，按排期率计分。验证后暴露指标缺陷：商品 GMV 差异大却同分，尾部品长期占坑拉低整体质量</li><li><span class="m">第 3 轮 · 假设价值驱动</span>：引入 GMV 加权——按类目设 Am / Ah 收益阈值，A 值达标才计分、达成越高分越高，让「招品质量」与「业务增量」直接挂钩</li><li><span class="m">结果</span>：机制跑通后新品补齐品牌与类目空缺，带动考核类目 <span class="m">日均 19w GMV 增量</span>；周均产出机会清单 100 个、上新率 ~26%、爆品率 9%</li><li><span class="m">沉淀</span>：把一次性的考核动作，做成「指标定义机会 → 数据反馈调节行为」的可复用机制，可迁移到其他招商场景</li></ul></div></div></div>
+<div class="card rv"><div class="case-cap">机会三级类目发现机制</div><div class="card-t">设计「类目机会诊断机制」：把「哪个细分类目值得做」从拍脑袋变成可计算、可配置<span class="tag">↳ 机会新类目</span></div><div class="pills"><span class="pill">类目机会诊断</span><span class="pill">机会类目识别</span><span class="pill">日均 9 万 增量</span><span class="pill">23 品类</span></div><button class="case-toggle on" type="button" aria-expanded="true"><span class="ct-chev">▾</span><span class="ct-lab">收起机制迭代</span></button><div class="case-body open"><div class="inner"><ul><li><span class="m">问题</span>：部分细分类目增长空间大，但机会靠主观判断、供需缺口不可见，资源无法精准分配</li><li><span class="m">第 1 轮 · 假设缺口可计算</span>：用邻仓 / 去年同期 / 前年同期的均值、中位值算采销 gap 值，按邻仓算加权益率，纳入绩效 + 日维度看板 + 月度复盘。上线后发现：小 gap 无考核意义、口径太死难调控、卖场加权失衡、仓间规模不可比</li><li><span class="m">第 2 轮 · 假设口径可调控</span>：用类目 1% 卡最小 gap 值、卡控系数调口径松紧、a 值保邻仓缺口足够大、规模系数消除仓间差异——把固定公式升级成「可配置的决策工具」</li><li><span class="m">结果</span>：考核类目在保证收益率的前提下，带来 <span class="m">日均 9 万 GMV 增量</span>，填补机会空缺</li><li><span class="m">沉淀</span>：把类目机会判断沉淀为可诊断、可配置的 SOP，可迁移到其他类目与区域</li></ul></div></div></div>
 </div>
 <div class="card rv">
 <div class="card-t">现存商品标准化</div><ul>
@@ -327,35 +378,6 @@
 <li>主要负责百货全类目运营，负责日常活动运营，数据下钻归因，针对异常逐层定位，去年同比 <span class="m">GMV +2.48% / SKU +1.74% / 商家数 +14.57%</span></li>
 </ul>
 <div class="pills"><span class="pill">GMV +2.48%</span><span class="pill">数据下钻归因</span></div>
-</div>
-</section>
-<section class="sec" id="cases"><div class="sec-h">重点业绩案例</div>
-<div class="tip rv">📌 以下为<span class="m">真实一线运营</span>中的重点案例（数据来自拼多多·多多买菜），对应工作经历中「机会品 / 机会三级类目」模块的深度展开——也是我投入最多、产品思考最扎实的部分。</div>
-<div class="org">
-<div class="org-h"><h3>机会新品识别机制</h3><span class="d">选品机会识别</span></div>
-<div class="s">真实一线运营 · 拼多多多多买菜（2025-06 – 至今）</div>
-</div>
-<a class="golink" href="https://haqimi0906.github.io/" target="_blank" rel="noopener">查看作品集 →</a>
-<div class="card rv">
-<div class="card-t">从 0 设计招商招品机制：用 3 轮迭代把「招好新品」做成可量化、可规模化的产品</div>
-<div class="pills"><span class="pill">招商招品机制</span><span class="pill">3 轮迭代</span><span class="pill">日均 19w 增量</span><span class="pill">周 100 新品</span></div>
-<button class="case-toggle on" type="button" aria-expanded="true"><span class="ct-chev">▾</span><span class="ct-lab">收起机制迭代</span></button>
-<div class="case-body open"><div class="inner"><ul>
-<li><span class="m">问题</span>：好新品靠采销个人经验，卖场无法驱动、增量难归因——根因是「机会」没被定义成可分配、可追踪的任务</li><li><span class="m">第 1 轮 · 假设数量驱动</span>：按同期 / 邻仓 / 外源三视角生成招品清单，采销按类目难度计分纳入绩效。上线后发现采销配合度低——招品方向由卖场定，与采销自身节奏冲突</li><li><span class="m">第 2 轮 · 假设质量（排期）驱动</span>：把选择权交还采销——限定品牌 / 品质 / 品相角度，采销自选 SPU、卖场核查，按排期率计分。验证后暴露指标缺陷：商品 GMV 差异大却同分，尾部品长期占坑拉低整体质量</li><li><span class="m">第 3 轮 · 假设价值驱动</span>：引入 GMV 加权——按类目设 Am / Ah 收益阈值，A 值达标才计分、达成越高分越高，让「招品质量」与「业务增量」直接挂钩</li><li><span class="m">结果</span>：机制跑通后新品补齐品牌与类目空缺，带动考核类目 <span class="m">日均 19w GMV 增量</span>；周均产出机会清单 100 个、上新率 ~26%、爆品率 9%</li><li><span class="m">沉淀</span>：把一次性的考核动作，做成「指标定义机会 → 数据反馈调节行为」的可复用机制，可迁移到其他招商场景</li>
-</ul></div></div>
-</div>
-<div class="org">
-<div class="org-h"><h3>机会三级类目发现机制</h3><span class="d">类目机会识别</span></div>
-<div class="s">真实一线运营 · 拼多多多多买菜（2025-06 – 至今）</div>
-</div>
-<a class="golink" href="https://haqimi0906.github.io/" target="_blank" rel="noopener">查看作品集 →</a>
-<div class="card rv">
-<div class="card-t">设计「类目机会诊断机制」：把「哪个细分类目值得做」从拍脑袋变成可计算、可配置</div>
-<div class="pills"><span class="pill">类目机会诊断</span><span class="pill">机会类目识别</span><span class="pill">日均 9 万 增量</span><span class="pill">23 品类</span></div>
-<button class="case-toggle on" type="button" aria-expanded="true"><span class="ct-chev">▾</span><span class="ct-lab">收起机制迭代</span></button>
-<div class="case-body open"><div class="inner"><ul>
-<li><span class="m">问题</span>：部分细分类目增长空间大，但机会靠主观判断、供需缺口不可见，资源无法精准分配</li><li><span class="m">第 1 轮 · 假设缺口可计算</span>：用邻仓 / 去年同期 / 前年同期的均值、中位值算采销 gap 值，按邻仓算加权益率，纳入绩效 + 日维度看板 + 月度复盘。上线后发现：小 gap 无考核意义、口径太死难调控、卖场加权失衡、仓间规模不可比</li><li><span class="m">第 2 轮 · 假设口径可调控</span>：用类目 1% 卡最小 gap 值、卡控系数调口径松紧、a 值保邻仓缺口足够大、规模系数消除仓间差异——把固定公式升级成「可配置的决策工具」</li><li><span class="m">结果</span>：考核类目在保证收益率的前提下，带来 <span class="m">日均 9 万 GMV 增量</span>，填补机会空缺</li><li><span class="m">沉淀</span>：把类目机会判断沉淀为可诊断、可配置的 SOP，可迁移到其他类目与区域</li>
-</ul></div></div>
 </div>
 </section>
 <section class="sec" id="proj"><div class="sec-h">项目经历</div>
